@@ -1,0 +1,11 @@
+[workspace]
+members = ["src/main", "src/mapserver"]
+default-members = ["src/mapserver"]
+resolver = "2"
+
+[profile.dev]
+panic = "abort"
+
+[profile.release]
+panic = "abort"
+lto = true
