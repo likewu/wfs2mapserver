@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
-use mapserver_rs::coordinates::Tile;
-use mapserver_rs::mappool::MapPool;
-use mapserver_rs::Extent;
+use mapserver::coordinates::Tile;
+use mapserver::mappool::MapPool;
+use mapserver::Extent;
 
 use axum::extract::Path;
 use axum::http::header;
@@ -82,8 +82,8 @@ async fn main() {
     // Spawn the web handler
     tokio::spawn(async move {
         println!("Listening on 0.0.0.0:3000");
-        axum::Server::bind(&"0.0.0.0:3000".parse().unwrap())
-            .serve(app.into_make_service())
+        let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
+        axum::serve(listener, app.into_make_service())
             .await
             .unwrap();
     });

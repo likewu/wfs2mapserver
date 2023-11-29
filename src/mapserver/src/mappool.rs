@@ -11,7 +11,7 @@ use threadpool::ThreadPool;
 use mapserver_sys::{
     mapObj, msCleanup, msDebugCleanup, msDrawMap, msFreeImage, msFreeMap, msGDALCleanup,
     msIO_Cleanup, msLoadMapFromString, msMapSetExtent, msOGRCleanup,
-    msProjectionContextPoolCleanup, msSaveImageBuffer, msSetPROJ_DATA,
+    msSaveImageBuffer, //msProjectionContextPoolCleanup, msSetPROJ_DATA,
 };
 
 use super::Extent;
@@ -171,8 +171,8 @@ impl MapPool {
                         msGDALCleanup();
                         msOGRCleanup();
                         msIO_Cleanup();
-                        msSetPROJ_DATA(std::ptr::null(), std::ptr::null());
-                        msProjectionContextPoolCleanup();
+                        //msSetPROJ_DATA(std::ptr::null(), std::ptr::null());
+                        //msProjectionContextPoolCleanup();
                     }
                 }
             }
