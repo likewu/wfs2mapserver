@@ -45,10 +45,11 @@ pub fn make_mapfile_str(timestamp: i64) -> String {
             PROJECTION
               AUTO
             END
-            DATA '/home/mperry/work/tiledb/naip/naip-combined'
+            DATA '/mnt/data/app/julia/wfs2map/work/tiledb/chinadixing.tif'
+            # DATA '/mnt/data/app/julia/wfs2map/work/tiledb/naip/naip-combined'
             # DATA 's3://perrygeo-tiledb/arrays/naip-2017'
             CONNECTIONOPTIONS
-              'TILEDB_CONFIG'	'/home/mperry/work/tiledb/tiledb.aws.config'
+              'TILEDB_CONFIG'	'/mnt/data/app/julia/wfs2map/work/tiledb/tiledb.aws.config'
               'TILEDB_TIMESTAMP' '{}'
             END
             PROCESSING 'CLOSE_CONNECTION=DEFER'
