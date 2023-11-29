@@ -10,7 +10,7 @@ fn main() {
     let bindings = bindgen::Builder::default()
         .header("wrapper.hpp")
         .allowlist_function("ms.*")
-        .clang_args(vec![format!("-I{}/dist/include", &out_dir), "-I/usr/include/gdal".to_string()])
+        .clang_args(vec![format!("-I{}/dist/include", &out_dir), "-I/usr/include/gdal".to_string(), "-I/mnt/data/app/opt/include".to_string(), "-DACCEPT_USE_OF_DEPRECATED_PROJ_API_H".to_string()])
         .generate()
         .expect("Unable to generate bindings");
 

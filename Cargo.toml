@@ -1,5 +1,5 @@
 [workspace]
-members = ["src/main", "src/mapserver"]
+members = ["src/mapserver"]
 default-members = ["src/mapserver"]
 resolver = "2"
 

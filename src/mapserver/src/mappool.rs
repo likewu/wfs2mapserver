@@ -11,7 +11,8 @@ use threadpool::ThreadPool;
 use mapserver_sys::{
     mapObj, msCleanup, msDebugCleanup, msDrawMap, msFreeImage, msFreeMap, msGDALCleanup,
     msIO_Cleanup, msLoadMapFromString, msMapSetExtent, msOGRCleanup,
-    msSaveImageBuffer, //msProjectionContextPoolCleanup, msSetPROJ_DATA,
+    msSaveImageBuffer, msProjectionContextPoolCleanup, msSetPROJ_DATA,
+    configObj,
 };
 
 use super::Extent;
@@ -31,7 +32,7 @@ impl Map {
         let mapfile_cstr = CString::new(mapfile_contents).unwrap();
         let buffer = mapfile_cstr.as_ptr() as *mut c_char;
 
-        let map_obj = unsafe { msLoadMapFromString(buffer, std::ptr::null_mut() as *mut c_char) };
+        let map_obj = unsafe { msLoadMapFromString(buffer, std::ptr::null_mut() as *mut c_char, std::ptr::null_mut() as *const configObj) };
         if map_obj.is_null() {
             panic!("Unable to load mapfile");
         }
@@ -171,8 +172,8 @@ impl MapPool {
                         msGDALCleanup();
                         msOGRCleanup();
                         msIO_Cleanup();
-                        //msSetPROJ_DATA(std::ptr::null(), std::ptr::null());
-                        //msProjectionContextPoolCleanup();
+                        msSetPROJ_DATA(std::ptr::null(), std::ptr::null());
+                        msProjectionContextPoolCleanup();
                     }
                 }
             }
