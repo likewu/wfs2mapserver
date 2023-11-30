@@ -19,8 +19,8 @@ pub fn make_mapfile_str(timestamp: i64) -> String {
           PROJECTION
             'init=epsg:3857'
           END
-          EXTENT -11711375.725741563 4941042.382410363 -11711222.851684993 4941195.256466932
-          UNITS METERS
+          EXTENT 73.498999 20.207173812500002 135.08835446875 53.561666
+          UNITS DD
           DEBUG 5
           CONFIG 'CPL_DEBUG' 'ON'
           CONFIG 'CPL_TIMESTAMP' 'ON'
@@ -48,13 +48,13 @@ pub fn make_mapfile_str(timestamp: i64) -> String {
             DATA '/mnt/data/app/julia/wfs2map/work/tiledb/chinadixing.tif'
             # DATA '/mnt/data/app/julia/wfs2map/work/tiledb/naip/naip-combined'
             # DATA 's3://perrygeo-tiledb/arrays/naip-2017'
-            CONNECTIONOPTIONS
-              'TILEDB_CONFIG'	'/mnt/data/app/julia/wfs2map/work/tiledb/tiledb.aws.config'
-              'TILEDB_TIMESTAMP' '{}'
-            END
+            #CONNECTIONOPTIONS
+            #  'TILEDB_CONFIG'	'/mnt/data/app/julia/wfs2map/work/tiledb/tiledb.aws.config'
+            #  'TILEDB_TIMESTAMP' '{}'
+            #END
             PROCESSING 'CLOSE_CONNECTION=DEFER'
-            PROCESSING 'BANDS=1,2,3,4'
-            PROCESSING 'SCALE_4=0,1'  # Hack to ignore band 4`
+            PROCESSING 'BANDS=1'
+            PROCESSING 'SCALE=AUTO'  # Hack to ignore band 4`
           END
         END",
         timestamp

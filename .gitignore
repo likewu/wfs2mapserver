@@ -8,3 +8,5 @@ target
 *.core
 *.profraw
 .DS_Store
+/chinadixing.tif
+/chinadixing_tif.rlk

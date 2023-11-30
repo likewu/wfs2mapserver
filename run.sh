@@ -4,7 +4,12 @@ RUSTFLAGS="-Clink-arg=-L -Clink-arg=/mnt/data/app/opt/lib" cargo build
 LD_LIBRARY_PATH=/mnt/data/app/opt/lib /mnt/data/app/julia/wfs2map/target/debug/mapserver
 
 
+#D:\nodejs-nvm\v14.19.1\node E:\app\nodejs\demo\geotiffinfo.js
+#http://192.168.1.11:3000/map/2019/1/100/30
+
+
 https://demo.mapserver.org/cgi-bin/wfs?SERVICE=WFS&VERSION=1.0.0&REQUEST=GetCapabilities
+https://demo.mapserver.org/cgi-bin/wfs?SERVICE=WFS&VERSION=1.0.0&REQUEST=getfeature&TYPENAME=continents&MAXFEATURES=100
 
 
 sudo apt install libcurlpp-dev libxml2-dev libprotobuf-c-dev protobuf-c-compiler libfcgi-dev swig

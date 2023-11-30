@@ -42,7 +42,8 @@
 			return Math.floor(Math.random() * (max - min + 1)) + min;
 		}
 
-		var map = L.map('map').setView([40.507, -105.151], 19);
+    let center = L.latLng(36, 103);
+		var map = L.map('map').setView(center, 5);
 		var tiles;
 
 
@@ -58,7 +59,7 @@
 			const uid = 0;
 
 			// Tile layer itself
-			tiles = L.tileLayer(`./map/${timestamp}/{z}/{x}/{y}`, {maxZoom: 19}).addTo(map);
+			tiles = L.tileLayer(`./map/${timestamp}/{z}/{x}/{y}`, {maxZoom: 5}).addTo(map);
 
 			// Grid Layer for debugging
 			L.GridLayer.GridDebug = L.GridLayer.extend({
