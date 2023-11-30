@@ -38,23 +38,28 @@ pub fn make_mapfile_str(timestamp: i64) -> String {
           IMAGETYPE 'png'
           SHAPEPATH '/tmp'
           LAYER
-            NAME 'default'
-            TYPE RASTER
+            NAME'continents'
+            TYPE POLYGON
             STATUS ON
-            DEBUG 5
-            PROJECTION
-              AUTO
+            CONNECTION 'https://demo.mapserver.org/cgi-bin/wfs?'
+            CONNECTIONTYPE WFS
+            METADATA
+              'wfs_typename'          'continents'
+              'wfs_version'           '1.0.0'
+              'wfs_connectiontimeout' '60'
+              'wfs_maxfeatures'       '10'
             END
-            DATA '/mnt/data/app/julia/wfs2map/work/tiledb/chinadixing.tif'
-            # DATA '/mnt/data/app/julia/wfs2map/work/tiledb/naip/naip-combined'
-            # DATA 's3://perrygeo-tiledb/arrays/naip-2017'
-            #CONNECTIONOPTIONS
-            #  'TILEDB_CONFIG'	'/mnt/data/app/julia/wfs2map/work/tiledb/tiledb.aws.config'
-            #  'TILEDB_TIMESTAMP' '{}'
-            #END
-            PROCESSING 'CLOSE_CONNECTION=DEFER'
-            PROCESSING 'BANDS=1'
-            PROCESSING 'SCALE=AUTO'  # Hack to ignore band 4`
+            PROJECTION
+              'init=epsg:4326'
+              #{}
+            END
+            CLASS
+              NAME 'Continents'
+              STYLE
+                COLOR 255 128 128
+                OUTLINECOLOR 96 96 96
+              END
+            END
           END
         END",
         timestamp
