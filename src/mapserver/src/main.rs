@@ -11,6 +11,19 @@ use axum::Extension;
 use axum::{routing::get, Router};
 use tokio::sync::Mutex;
 
+use axum_swagger_ui::swagger_ui;
+
+use async_trait::async_trait;
+use axum::{
+    body::{Body, BoxBody},
+    extract::{extractor_middleware, FromRequest, RequestParts},
+    handler::{get, post},
+    http::{StatusCode,Request,Uri},
+    response::{Html,IntoResponse,Redirect},
+    routing::BoxRoute,
+    Router,
+};
+
 pub fn make_mapfile_str(timestamp: i64) -> String {
     format!(
         "MAP
@@ -79,10 +92,23 @@ async fn main() {
         maplock: Mutex::new(map_pool),
     });
 
+    fn api_routes() -> Router<BoxRoute> {
+        Router::new()
+            .route("/users", get(api_users))
+            .route("/job", post(api_job))
+            .layer(extractor_middleware::<RequireAuth>())
+            .boxed()
+    }
+
     // Routes
+    let doc_url = "swagger/openapi.yaml";
     let app = Router::new()
         .route("/", get(index))
+        .route("/login", get(login))
         .route("/map/:timestamp/:z/:x/:y", get(render_map))
+        .route("/swagger", get(|| async { swagger_ui(doc_url) }))
+        .route(doc_url, get(|| async { include_str!("openapi.yaml") }))
+        .nest("/api", api_routes())
         .layer(Extension(shared_state));
 
     // Spawn the web handler
@@ -122,4 +148,44 @@ async fn render_map(
     let image_bytes = renderer.render(extent);
 
     ([(header::CONTENT_TYPE, "image/png")], image_bytes)
+}
+
+
+// An extractor that performs authorization.
+struct RequireAuth;
+
+#[async_trait]
+impl<B> FromRequest<B> for RequireAuth
+where
+    B: Send,
+{
+    type Rejection = Redirect; //StatusCode;
+
+    async fn from_request(req: &mut RequestParts<B>) -> Result<Self, Self::Rejection> {
+        let auth_header = req
+            .headers()
+            .and_then(|headers| headers.get(axum::http::header::AUTHORIZATION))
+            .and_then(|value| value.to_str().ok());
+
+        if let Some(value) = auth_header {
+            if value == "secret" {
+                return Ok(Self);
+            }
+        }
+
+        //Err(StatusCode::UNAUTHORIZED)
+        Err(Redirect::to(Uri::from_static("/login")))
+    }
+}
+
+async fn login() -> impl IntoResponse {
+    Html("<h1>Login Page</h1>")
+}
+
+async fn api_users() ->impl IntoResponse  {
+    "api_users"
+}
+
+async fn api_job() -> impl IntoResponse  {
+    "job".to_string()
 }

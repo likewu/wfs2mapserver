@@ -17,6 +17,18 @@ use mapserver_sys::{
 
 use super::Extent;
 
+use tower_http::{
+    decompression::DecompressionLayer,
+    set_header::SetRequestHeaderLayer,
+    trace::TraceLayer,
+    classify::StatusInRangeAsFailures,
+};
+use tower::{ServiceBuilder, Service, ServiceExt};
+use hyper_util::{rt::TokioExecutor, client::legacy::Client};
+use http_body_util::Full;
+use bytes::Bytes;
+use http::{Request, HeaderValue, header::USER_AGENT};
+
 const MAP_IDLE_TIMEOUT_SECONDS: u64 = 60 * 60;
 
 ///
@@ -108,6 +120,7 @@ pub struct MapPool {
     lookup: Arc<Mutex<HashMap<String, MapRenderChannel>>>,
     threads: ThreadPool,
     exit_sender: Sender<String>,
+    http_client: ServiceBuilder,
 }
 
 impl MapPool {
@@ -129,8 +142,22 @@ impl MapPool {
                     select! {
                       recv(extent_receiver) -> extent => {
                           if let Ok(extent) = extent {
-                              let img = map.draw(extent);
-                              img_sender.send(img).unwrap();
+                              //let img = map.draw(extent);
+                              //img_sender.send(img).unwrap();
+
+                              // Make a request
+                              let request = Request::builder()
+                                  .uri("http://example.com")
+                                  .body(Full::<Bytes>::default())
+                                  .unwrap();
+                              let response = self.http_client
+                                  .ready()
+                                  .await
+                                  .unwrap()
+                                  .call(request)
+                                  .await
+                                  .unwrap();
+                              //img_sender.send(response).unwrap();
                           } else {
                               break
                           }
@@ -179,10 +206,30 @@ impl MapPool {
             }
         });
 
+        let http_client = Client::builder(TokioExecutor::new()).build_http();
+        let mut http_client = ServiceBuilder::new()
+        // Add tracing and consider server errors and client
+        // errors as failures.
+        .layer(TraceLayer::new(
+            StatusInRangeAsFailures::new(400..=599).into_make_classifier()
+        ))
+        // Set a `User-Agent` header on all requests.
+        .layer(SetRequestHeaderLayer::overriding(
+            USER_AGENT,
+            HeaderValue::from_static("tower-http demo")
+        ))
+        // Decompress response bodies
+        .layer(DecompressionLayer::new())
+        // Wrap a `Client` in our middleware stack.
+        // This is possible because `Client` implements
+        // `tower::Service`.
+        .service(http_client);
+
         MapPool {
             lookup,
             threads,
             exit_sender,
+            http_client,
         }
     }
 }
