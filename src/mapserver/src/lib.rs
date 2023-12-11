@@ -1,6 +1,8 @@
 pub mod coordinates;
 pub mod mappool;
 
+mod authjwks;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize, Serialize)]

@@ -24,6 +24,11 @@ use axum::{
     Router,
 };
 
+
+use axum::middleware;
+use axum_jwks::Jwks;
+use crate::authjwks;
+
 pub fn make_mapfile_str(timestamp: i64) -> String {
     format!(
         "MAP
@@ -92,11 +97,29 @@ async fn main() {
         maplock: Mutex::new(map_pool),
     });
 
+
+    let jwks = Jwks::from_oidc_url(
+        // The Authorization Server that signs the JWTs you want to consume.
+        "https://my-auth-server.example.com/.well-known/openid-configuration",
+        // The audience identifier for the application. This ensures that
+        // JWTs are intended for this application.
+        "https://my-api-identifier.example.com/".to_owned(),
+    )
+    .await
+    .unwrap();
+    let state_jwks = authjwks::AppState { jwks };
+
+
     fn api_routes() -> Router<BoxRoute> {
         Router::new()
             .route("/users", get(api_users))
             .route("/job", post(api_job))
             .layer(extractor_middleware::<RequireAuth>())
+            //.route_layer(middleware::from_fn_with_state(
+            //    state_jwks.clone(),
+            //    authjwks::validate_token,
+            //))
+            //.with_state(state_jwks);
             .boxed()
     }
 
