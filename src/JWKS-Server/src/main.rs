@@ -230,6 +230,7 @@ async fn openid_config() -> impl Responder {
 ///
 #[get("/.well-known/jwks.json")]
 async fn jwks_json() -> impl Responder {
+    info!("bbbbbbbbbbb");
     use rsa::traits::PublicKeyParts;
     // JWKS integers are big-endian and base64-url encoded w/o padding
     let e = general_purpose::URL_SAFE_NO_PAD.encode(APP_STATE.pub_key.e().to_bytes_be());
@@ -293,10 +294,10 @@ fn config(cfg: &mut web::ServiceConfig) {
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     env_logger::init();
-    let host = env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_owned());
+    let host = env::var("HOST").unwrap_or_else(|_| "192.168.1.11".to_owned());
     let port = env::var("PORT").unwrap_or_else(|_| "8080".to_owned());
     let addr = format!("{}:{}", host, port);
-    let protocol = env::var("PROTOCOL").unwrap_or_else(|_| "https".to_owned());
+    let protocol = env::var("PROTOCOL").unwrap_or_else(|_| "http".to_owned());
     if protocol == "https" {
         let rustls_config =
             load_rustls_config().map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e))?;

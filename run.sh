@@ -26,3 +26,13 @@ make install
 https://github.com/perrygeo/openlayers/blob/40f92963727d9e1bac1287ceea2395a1a99f50f7/lib/OpenLayers/Protocol/WFS.js#L30
 https://github.com/perrygeo/ol3/blob/163cc5b8730629955390a0a1051d273e5660c22f/src/ol/format/wfsformat.js#L27
 https://github.com/perrygeo/ol3/blob/163cc5b8730629955390a0a1051d273e5660c22f/examples/vector-wfs.js#L16
+
+
+cd /mnt/data/app/julia/wfs2map/src/JWKS-Server && RUST_LOG=info,dep1=debug cargo run
+cd /mnt/data/app/julia/wfs2map/src/JWKS-Server && /mnt/data/app/consul/envoy -c docker/envoy/envoy.yaml -l debug
+curl -d "client_id=service&username=johndoe&password=tiger2&grant_type=password" http://192.168.1.11:8000/tokens | jq
+curl http://192.168.1.11:8000/.well-known/jwks.json
+let ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.XOHs619Krkxp3LKBFYa3afSdE5NtDUzj40VNIcP08DY"
+curl -v http://192.168.1.11:8000/.well-known/jwks.json -H $"Authorization: Bearer ($ACCESS_TOKEN)"
+
+

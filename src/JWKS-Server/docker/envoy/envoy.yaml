@@ -33,10 +33,10 @@ static_resources:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
                       providers:
                         keycloak_user:
-                          issuer: http://localhost:8000/api/
+                          issuer: http://192.168.1.11:8000/
                           remote_jwks:
                             http_uri:
-                              uri: http://127.0.0.1:8080/.well-known/jwks.json
+                              uri: http://192.168.1.11:8080/.well-known/jwks.json
                               cluster: keycloak
                               timeout: 1s
                             cache_duration:
@@ -45,13 +45,36 @@ static_resources:
                           forward_payload_header: x-jwt-payload
                       rules:
                         - match:
-                            prefix: /_/_/health/
-                        - match:
                             prefix: /
                           requires:
                             provider_name: keycloak_user
                       bypass_cors_preflight: true
+                  #- name: envoy.filters.http.rbac 
+                  #  typed_config:
+                  #    "@type": type.googleapis.com/envoy.extensions.filters.http.rbac.v3.RBAC       
+                  #    rules: 
+                  #      action: ALLOW
+                  #      policies:
+                  #        "allow-sub-match-rule":
+                  #          permissions:
+                  #          - and_rules:
+                  #              rules:
+                  #              - header: { name: ":method", exact_match: "GET" }
+                  #              - header: { name: "User", exact_match: "sal" }
+                  #              - url_path:
+                  #                  path: { prefix: "/" }
+                  #          principals:                 
+                  #          - metadata:
+                  #              filter: envoy.filters.http.jwt_authn
+                  #              path:
+                  #                - key: my_payload
+                  #                - key: sub
+                  #              value:
+                  #                string_match:
+                  #                  exact:  "testing@secure.istio.io"                            
                   - name: envoy.filters.http.router
+                    typed_config:
+                      "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
 
   clusters:
     - name: keycloak
@@ -75,7 +98,7 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: 127.0.0.1
+                      address: 192.168.1.11
                       port_value: 8080
 
     - name: local_service
