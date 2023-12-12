@@ -56,7 +56,7 @@ static APP_STATE: Lazy<AppState> = Lazy::new(|| {
 });
 
 static ISSUER_URI: Lazy<String> =
-    Lazy::new(|| env::var("BASE_URI").unwrap_or_else(|_| "https://127.0.0.1:3000".to_owned()));
+    Lazy::new(|| env::var("BASE_URI").unwrap_or_else(|_| "http://192.168.1.11:8000".to_owned()));
 
 ///
 /// A single entity as read from the USERS_FILE (users.json) file.
@@ -230,7 +230,6 @@ async fn openid_config() -> impl Responder {
 ///
 #[get("/.well-known/jwks.json")]
 async fn jwks_json() -> impl Responder {
-    info!("bbbbbbbbbbb");
     use rsa::traits::PublicKeyParts;
     // JWKS integers are big-endian and base64-url encoded w/o padding
     let e = general_purpose::URL_SAFE_NO_PAD.encode(APP_STATE.pub_key.e().to_bytes_be());
