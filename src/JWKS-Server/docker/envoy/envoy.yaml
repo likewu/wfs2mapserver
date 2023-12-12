@@ -47,7 +47,10 @@ static_resources:
                         - match:
                             prefix: /
                           requires:
-                            provider_name: keycloak_user
+                            requires_any:
+                              requirements:
+                              - provider_name: keycloak_user
+                                allow_missing_or_failed: true
                       bypass_cors_preflight: true
                   #- name: envoy.filters.http.rbac 
                   #  typed_config:
@@ -90,7 +93,7 @@ static_resources:
           unhealthy_threshold: 1
           healthy_threshold: 1
           http_health_check:
-            path: "/auth/"
+            path: "/status"
       load_assignment:
         cluster_name: keycloak
         endpoints:
@@ -122,5 +125,5 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: api
+                      address: 192.168.1.11
                       port_value: 8080
