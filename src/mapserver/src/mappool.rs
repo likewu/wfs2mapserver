@@ -14,6 +14,7 @@ use mapserver_sys::{
     msSaveImageBuffer, msProjectionContextPoolCleanup, msSetPROJ_DATA,
     configObj,
 };
+use tower::layer::util::Identity;
 
 use super::Extent;
 
@@ -24,10 +25,15 @@ use tower_http::{
     classify::StatusInRangeAsFailures,
 };
 use tower::{ServiceBuilder, Service, ServiceExt};
-use hyper_util::{rt::TokioExecutor, client::legacy::Client};
+//use hyper_util::{rt::TokioExecutor, client::legacy::Client};
 use http_body_util::Full;
 use bytes::Bytes;
 use http::{Request, HeaderValue, header::USER_AGENT};
+
+
+use hyper::Client;
+use hyper_tls::HttpsConnector;
+
 
 const MAP_IDLE_TIMEOUT_SECONDS: u64 = 60 * 60;
 
@@ -120,7 +126,7 @@ pub struct MapPool {
     lookup: Arc<Mutex<HashMap<String, MapRenderChannel>>>,
     threads: ThreadPool,
     exit_sender: Sender<String>,
-    http_client: ServiceBuilder,
+    http_client: Client,
 }
 
 impl MapPool {
@@ -146,17 +152,38 @@ impl MapPool {
                               //img_sender.send(img).unwrap();
 
                               // Make a request
-                              let request = Request::builder()
-                                  .uri("http://example.com")
-                                  .body(Full::<Bytes>::default())
-                                  .unwrap();
-                              let response = self.http_client
-                                  .ready()
-                                  .await
-                                  .unwrap()
-                                  .call(request)
-                                  .await
-                                  .unwrap();
+                              let gist_param = CreateGistParam {
+                                description: "gist created via hyper".to_string(),
+                                public: true,
+                                files: vec![
+                                    GistFile {
+                                        name: "README.md".to_string(),
+                                        content: README.to_string(),
+                                    },
+                                    GistFile {
+                                        name: "main.rs".to_string(),
+                                        content: CODE.to_string(),
+                                    },
+                                ],
+                            };
+                            let mut header_value = b"Basic ".to_vec();
+                            {
+                                // create new scope to make borrow check happy
+                                // header 格式: authorization: Basic {user} {password}
+                                let mut encoder = base64::write::EncoderWriter::new(&mut header_value, base64::STANDARD);
+                                write!(encoder, "{}:{}", user, token).unwrap();
+                            }
+                              let req = hyper::Request::builder()
+                                .method(Method::POST)
+                                .uri("https://api.github.com/gists")
+                                .header("User-Agent", "hyper")
+                                .header("Accept", "application/vnd.github.v3+json")
+                                .header("Authorization", header_value)
+                                .body(CreateGistBody::new(gist_param))?;
+                              let mut res = client.request(req).await?;
+                              if !res.status().is_success() {
+                                return Err(anyhow::format_err!("{}", res.status()));
+                              }
                               //img_sender.send(response).unwrap();
                           } else {
                               break
@@ -206,24 +233,7 @@ impl MapPool {
             }
         });
 
-        let http_client = Client::builder(TokioExecutor::new()).build_http();
-        let mut http_client = ServiceBuilder::new()
-        // Add tracing and consider server errors and client
-        // errors as failures.
-        .layer(TraceLayer::new(
-            StatusInRangeAsFailures::new(400..=599).into_make_classifier()
-        ))
-        // Set a `User-Agent` header on all requests.
-        .layer(SetRequestHeaderLayer::overriding(
-            USER_AGENT,
-            HeaderValue::from_static("tower-http demo")
-        ))
-        // Decompress response bodies
-        .layer(DecompressionLayer::new())
-        // Wrap a `Client` in our middleware stack.
-        // This is possible because `Client` implements
-        // `tower::Service`.
-        .service(http_client);
+        let http_client = Client::builder().build(HttpsConnector::new());
 
         MapPool {
             lookup,

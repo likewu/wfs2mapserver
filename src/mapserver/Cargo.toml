@@ -7,16 +7,21 @@ edition = "2021"
 mapserver-sys = { path = "../mapserver-sys"}
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-axum = "*"
+axum = { version = "0.6.20", features = ["headers"] }
 hyper = { version = "*", features = ["full"] }
+hyper-util = { version = "0.1.1", features = ["tokio", "client", "client-legacy", "http1"] }
+hyper-tls = "0.6.0"
 tokio = { version = "*", features = ["full"] }
 tower = "*"
 threadpool = "1"
 crossbeam-channel = "*"
 libc = "0.2.151"
 axum-swagger-ui = "0.3.0"
-tower-http = "0.5.0"
+http = "1.0.0"
+tower-http = { version = "0.5.0", features = ["decompression-gzip", "set-header", "trace"]}
 http-body = "1.0.0"
+http-body-util = "0.1.0"
+bytes = "1.5.0"
 
 axum-jwks = "0.5.0"
 
