@@ -33,7 +33,7 @@ static_resources:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
                       providers:
                         keycloak_user:
-                          issuer: http://m1ddns.pvtool.com:8000/
+                          issuer: http://192.168.1.11:8000/
                           remote_jwks:
                             http_uri:
                               uri: http://m1ddns.pvtool.com:8080/.well-known/jwks.json
@@ -47,11 +47,11 @@ static_resources:
                         - match:
                             prefix: /
                           requires:
-                            provider_name: keycloak_user
-                            #requires_any:
-                            #  requirements:
-                            #  - provider_name: keycloak_user
-                            #  - allow_missing_or_failed: {}
+                            #provider_name: keycloak_user
+                            requires_any:
+                              requirements:
+                              - provider_name: keycloak_user
+                              - allow_missing_or_failed: {}
                       bypass_cors_preflight: true
                   #- name: envoy.filters.http.rbac 
                   #  typed_config:
