@@ -294,7 +294,7 @@ async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     env_logger::init();
     let host = env::var("HOST").unwrap_or_else(|_| "127.0.0.1".to_owned());
-    let port = env::var("PORT").unwrap_or_else(|_| "3000".to_owned());
+    let port = env::var("PORT").unwrap_or_else(|_| "8080".to_owned());
     let addr = format!("{}:{}", host, port);
     let protocol = env::var("PROTOCOL").unwrap_or_else(|_| "https".to_owned());
     if protocol == "https" {

@@ -33,21 +33,10 @@ static_resources:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
                       providers:
                         keycloak_user:
-                          issuer: http://localhost:8180/auth/realms/test
+                          issuer: http://localhost:8000/api/
                           remote_jwks:
                             http_uri:
-                              uri: http://keycloak:8080/auth/realms/test/protocol/openid-connect/certs
-                              cluster: keycloak
-                              timeout: 1s
-                            cache_duration:
-                              seconds: 30
-                          forward: false
-                          forward_payload_header: x-jwt-payload
-                        keycloak_admin:
-                          issuer: http://localhost:8180/auth/realms/admin
-                          remote_jwks:
-                            http_uri:
-                              uri: http://keycloak:8080/auth/realms/admin/protocol/openid-connect/certs
+                              uri: http://127.0.0.1:8080/.well-known/jwks.json
                               cluster: keycloak
                               timeout: 1s
                             cache_duration:
@@ -57,10 +46,6 @@ static_resources:
                       rules:
                         - match:
                             prefix: /_/_/health/
-                        - match:
-                            prefix: /admin/
-                          requires:
-                            provider_name: keycloak_admin
                         - match:
                             prefix: /
                           requires:
@@ -90,7 +75,7 @@ static_resources:
               - endpoint:
                   address:
                     socket_address:
-                      address: keycloak
+                      address: 127.0.0.1
                       port_value: 8080
 
     - name: local_service

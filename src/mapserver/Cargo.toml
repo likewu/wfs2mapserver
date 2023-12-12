@@ -7,7 +7,7 @@ edition = "2021"
 mapserver-sys = { path = "../mapserver-sys"}
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-axum = { version = "0.6.20", features = ["headers"] }
+axum = { version = "0.7.2", features = [] }
 hyper = { version = "*", features = ["full"] }
 hyper-util = { version = "0.1.1", features = ["tokio", "client", "client-legacy", "http1"] }
 hyper-tls = "0.6.0"
@@ -24,6 +24,8 @@ http-body-util = "0.1.0"
 bytes = "1.5.0"
 
 axum-jwks = "0.5.0"
+
+async-trait = "0.1.74"
 
 [profile.release]
 lto = true

@@ -6,28 +6,25 @@ use mapserver::Extent;
 
 use axum::extract::Path;
 use axum::http::header;
-use axum::response::{Html, IntoResponse};
 use axum::Extension;
-use axum::{routing::get, Router};
 use tokio::sync::Mutex;
 
 use axum_swagger_ui::swagger_ui;
 
 use async_trait::async_trait;
 use axum::{
-    body::{Body, BoxBody},
-    extract::{extractor_middleware, FromRequest, RequestParts},
-    handler::{get, post},
+    body::{Body},
+    //extract::{extractor_middleware, FromRequest, RequestParts},
+    routing::{get, post},
     http::{StatusCode,Request,Uri},
     response::{Html,IntoResponse,Redirect},
-    routing::BoxRoute,
+    routing::Route,
     Router,
 };
 
-
 use axum::middleware;
 use axum_jwks::Jwks;
-use crate::authjwks;
+use mapserver::authjwks;
 
 pub fn make_mapfile_str(timestamp: i64) -> String {
     format!(
@@ -110,17 +107,16 @@ async fn main() {
     let state_jwks = authjwks::AppState { jwks };
 
 
-    fn api_routes() -> Router<BoxRoute> {
+    fn api_routes() -> Router {
         Router::new()
             .route("/users", get(api_users))
             .route("/job", post(api_job))
-            .layer(extractor_middleware::<RequireAuth>())
+            //.layer(extractor_middleware::<RequireAuth>())
             //.route_layer(middleware::from_fn_with_state(
             //    state_jwks.clone(),
             //    authjwks::validate_token,
             //))
             //.with_state(state_jwks);
-            .boxed()
     }
 
     // Routes
@@ -130,7 +126,7 @@ async fn main() {
         .route("/login", get(login))
         .route("/map/:timestamp/:z/:x/:y", get(render_map))
         .route("/swagger", get(|| async { swagger_ui(doc_url) }))
-        .route(doc_url, get(|| async { include_str!("openapi.yaml") }))
+        .route(doc_url, get(|| async { include_str!("../swagger/openapi.yaml") }))
         .nest("/api", api_routes())
         .layer(Extension(shared_state));
 
@@ -161,23 +157,32 @@ async fn render_map(
     let mapfile_str = make_mapfile_str(timestamp);
 
     // Get a renderer from the map pool
-    let renderer = {
+    /*let renderer = {
         let mut map_pool = state.maplock.lock().await;
         map_pool.acquire_or_create(mapfile_str)
-    };
+    };*/
 
     // Yes, we can render concurrently on multiple threads!
     // GDAL may lock things internally though, negating much of the benefit
-    let image_bytes = renderer.render(extent);
+    //let image_bytes = renderer.render(extent);
 
-    ([(header::CONTENT_TYPE, "image/png")], image_bytes)
+    let mut map_pool = state.maplock.lock().await;
+    let url = "http://example.com".parse::<hyper::Uri>().unwrap();
+    if url.scheme_str() != Some("http") {
+        println!("This example only works with 'http' URLs.");
+        return Ok(());
+    }
+    let image_bytes = map_pool.fetch_url(url).await;
+
+    //([(header::CONTENT_TYPE, "image/png")], image_bytes)
+    ([(header::CONTENT_TYPE, "text/text")], image_bytes.unwrap())
 }
 
 
 // An extractor that performs authorization.
 struct RequireAuth;
 
-#[async_trait]
+/*#[async_trait]
 impl<B> FromRequest<B> for RequireAuth
 where
     B: Send,
@@ -199,7 +204,7 @@ where
         //Err(StatusCode::UNAUTHORIZED)
         Err(Redirect::to(Uri::from_static("/login")))
     }
-}
+}*/
 
 async fn login() -> impl IntoResponse {
     Html("<h1>Login Page</h1>")

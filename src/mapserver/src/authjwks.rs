@@ -1,10 +1,10 @@
 use axum::{
     extract::{FromRef, State},
-    headers::{authorization::Bearer, Authorization},
+    //headers::{authorization::Bearer, Authorization},
     http::{Request, StatusCode},
     middleware::Next,
     response::{IntoResponse, Response},
-    TypedHeader,
+    //TypedHeader,
 };
 use axum_jwks::Jwks;
 use serde::{Deserialize, Serialize};
@@ -22,7 +22,7 @@ impl FromRef<AppState> for Jwks {
         state.jwks.clone()
     }
 }
-
+/*
 /// A simple middleware that only verifies the default claims: `aud`, `exp`
 /// axum-jwks by default verifies `aud`
 /// jsonwebtoken by default validates `exp`
@@ -49,4 +49,4 @@ pub async fn validate_token<B>(
     }
 
     next.run(request).await
-}
+}*/
