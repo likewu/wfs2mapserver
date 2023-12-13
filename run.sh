@@ -28,11 +28,20 @@ https://github.com/perrygeo/ol3/blob/163cc5b8730629955390a0a1051d273e5660c22f/sr
 https://github.com/perrygeo/ol3/blob/163cc5b8730629955390a0a1051d273e5660c22f/examples/vector-wfs.js#L16
 
 
+https://www.funnel-labs.io/2022/10/21/envoyproxy-5-authorized-access-with-jwt/
 cd /mnt/data/app/julia/wfs2map/src/JWKS-Server && RUST_LOG=info,dep1=debug cargo run
 cd /mnt/data/app/julia/wfs2map/src/JWKS-Server && /mnt/data/app/consul/envoy -c docker/envoy/envoy.yaml -l debug
 curl -d "client_id=service&username=johndoe&password=tiger2&grant_type=password" http://192.168.1.11:8000/tokens | jq
 curl http://192.168.1.11:8000/.well-known/jwks.json
-let ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.XOHs619Krkxp3LKBFYa3afSdE5NtDUzj40VNIcP08DY"
-curl -v http://192.168.1.11:8000/.well-known/jwks.json -H $"Authorization: Bearer ($ACCESS_TOKEN)"
+{"keys":[{"alg":"RS256","kty":"RSA","use":"sig","n":"uwRXRCjow4hPZyguA6V4SK2jzcggA6tDlbYvx1m0a8X4Qu1aQ7UWxTXQRFkKgEY4LQkCEs5MJy8JMAX56p4CU6rHB7Elth_JtPToYEPGjmAFzH_2D7LQ49xk4jNJhAs_g4wmcHEPnesiijEc0wc9ZnI6-W2YT2PNAm3r4LYUQu6KS2eRGkHA_6Hi4gRWjFHPk2_j0LYTg3eQOu33Lgum1REusY1omMgflSF1eZdY_-y8HUy4sVNmJ61SOLAqBaICsv0eXtYM5rwR9Ioc0IXIxwQ_hhPMDn4Ck9AN8OqPIX4Cep3ocd3NSao66cwtsZI6qJz6Y338IjM98hhzAsnOSQ","e":"AQAB","kid":"6d4a32197d0c82cf414cdf6f0ccdac39e9c4f338"}]}
+let ACCESS_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6IjZkNGEzMjE5N2QwYzgyY2Y0MTRjZGY2ZjBjY2RhYzM5ZTljNGYzMzgifQ.eyJzdWIiOiJqb2huZG9lIiwiZXhwIjoxNzAyNDAyMTQ1LCJpYXQiOjE3MDIzOTg1NDUsImlzcyI6Imh0dHA6Ly8xOTIuMTY4LjEuMTE6ODAwMCIsIm5hbWUiOiJKb2huIERvZSIsInB1cnBvc2UiOiJyZWFkIn0.me0ic7naRpK1QB59G5JKQsF-agzfyo2lEUc8u5vup7ku_RXIXzYF2KB70SDj4ez5luly3intsYOkgtp-VzQdBKGb3qXmKO-jjjxLr2ea7ZxZ0BCVubanRu3yobB0Iu8igKrYoEajEaPdObMDWdqWIhl4-gbtjODwIk5vCIf113kdtROZwe7_GffgCiVDzrtsJeZwGWu2bQtJzFW0GXIT4iw22vMMaUs-G7BBqibkdXOrhpbiXLduLLJJNAxKbMIggtk9vKmqudn1bZxJGn2J7CXGcE0Ni2dHGXcUuN_hmpALgCBlDG1iMxQ4k52CjqIH-MokQzPsQXnBZ1zMH3AiJA"
+let ACCESS_TOKEN = (curl -d "client_id=service&username=johndoe&password=tiger2&grant_type=password" http://127.0.0.1:8080/tokens | jq -r '.access_token')
+curl -v http://192.168.1.11:8000/api/user -H $"Authorization: Bearer ($ACCESS_TOKEN)"
 
 
+#ip route add 192.168.101.0/24 via 192.168.1.2 #no use
+#LAPTOP-NEGU2RE3 静态ip 192.168.1.21
+#无线路由 组网模式：从路由模式
+sudo rm /usr/bin/python3
+sudo ln -s /usr/bin/python3.8 /usr/bin/python3
+sudo netplan apply

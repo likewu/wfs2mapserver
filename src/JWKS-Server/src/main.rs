@@ -56,7 +56,7 @@ static APP_STATE: Lazy<AppState> = Lazy::new(|| {
 });
 
 static ISSUER_URI: Lazy<String> =
-    Lazy::new(|| env::var("BASE_URI").unwrap_or_else(|_| "http://192.168.1.11:8000".to_owned()));
+    Lazy::new(|| env::var("BASE_URI").unwrap_or_else(|_| "http://laptop.pvtool.com:8000".to_owned()));
 
 ///
 /// A single entity as read from the USERS_FILE (users.json) file.
@@ -256,6 +256,15 @@ async fn app_status() -> impl Responder {
     HttpResponse::Ok()
 }
 
+#[get("/api/user")]
+async fn api_user(date: web::Header<actix_web::http::header::Date>) -> impl Responder {
+    HttpResponse::Ok().body(date.to_string())
+}
+
+async fn handler(req: HttpRequest) -> impl Responder {
+    HttpResponse::Ok().body(format!("header '{:?}'", req))
+}
+
 fn load_rustls_config() -> Result<rustls::ServerConfig, Error> {
     let config = ServerConfig::builder()
         .with_safe_defaults()
@@ -281,6 +290,11 @@ fn config(cfg: &mut web::ServiceConfig) {
         .service(openid_config)
         .service(jwks_json)
         .service(app_status)
+        .service(api_user)
+        .service(
+            web::resource("/api/echo").route(
+            web::to(handler))
+        )
         .service(
             actix_files::Files::new("/", "static")
                 .use_etag(true)
@@ -293,7 +307,7 @@ fn config(cfg: &mut web::ServiceConfig) {
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     env_logger::init();
-    let host = env::var("HOST").unwrap_or_else(|_| "192.168.1.11".to_owned());
+    let host = env::var("HOST").unwrap_or_else(|_| "0.0.0.0".to_owned());
     let port = env::var("PORT").unwrap_or_else(|_| "8080".to_owned());
     let addr = format!("{}:{}", host, port);
     let protocol = env::var("PROTOCOL").unwrap_or_else(|_| "http".to_owned());

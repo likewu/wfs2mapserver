@@ -33,10 +33,10 @@ static_resources:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication
                       providers:
                         keycloak_user:
-                          issuer: http://192.168.1.11:8000/
+                          issuer: http://laptop.pvtool.com:8000
                           remote_jwks:
                             http_uri:
-                              uri: http://m1ddns.pvtool.com:8080/.well-known/jwks.json
+                              uri: http://laptop.pvtool.com:8080/.well-known/jwks.json
                               cluster: keycloak
                               timeout: 1s
                             cache_duration:
@@ -102,7 +102,7 @@ static_resources:
           - endpoint:
               address:
                 socket_address:
-                  address: m1ddns.pvtool.com
+                  address: laptop.pvtool.com
                   port_value: 8080
 
     - name: local_service
@@ -126,5 +126,5 @@ static_resources:
           - endpoint:
               address:
                 socket_address:
-                  address: m1ddns.pvtool.com
+                  address: laptop.pvtool.com
                   port_value: 8080
