@@ -1,5 +1,5 @@
 [workspace]
-members = ["src/mapserver", "src/JWKS-Server"]
+members = ["src/mapserver", "src/JWKS-Server", "src/opencvvideo"]
 default-members = ["src/mapserver"]
 resolver = "2"
 

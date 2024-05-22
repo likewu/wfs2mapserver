@@ -160,8 +160,8 @@ impl MapPool {
                 loop {
                     select! {
                       recv(extent_receiver) -> extent => {
-                          if let Ok(extent) = extent {
-                              //let img = map.draw(extent);
+                          if let Ok(extent11) = extent {
+                              //let img = map.draw(extent11);
                               //img_sender.send(img).unwrap();
 
                               // Make a request
