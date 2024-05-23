@@ -3,5 +3,9 @@ name = "opencvvideo"
 version = "1.0.0"
 edition = "2021"
 
+[[bin]]
+name = "qr"
+path = "src/bin/qr.rs"
+
 [dependencies]
 opencv = "0.91.3"
