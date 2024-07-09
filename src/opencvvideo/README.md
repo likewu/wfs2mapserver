@@ -13,4 +13,8 @@ $env:OPENCV_LINK_LIBS = "opencv_world490"
 $env:OPENCV_LINK_PATHS = "D:\Programs\opencv\build\x64\vc16\lib"
 $env:OPENCV_INCLUDE_PATHS = "D:\Programs\opencv\build\include"
 
+cargo test -p opencvvideo orb
+
+HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment
+
 计算机\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UsoSvc

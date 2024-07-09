@@ -1,4 +1,4 @@
-#![cfg(ocvrs_has_module_objdetect)]
+//#![cfg(ocvrs_has_module_objdetect)]
 
 use std::path::Path;
 

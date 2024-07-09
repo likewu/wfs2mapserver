@@ -1,0 +1,2 @@
+[env]
+CARGO_CFG_ocvrs_has_module_objdetect = "true"

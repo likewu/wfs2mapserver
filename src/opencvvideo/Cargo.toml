@@ -12,4 +12,4 @@ name = "video_facedetect"
 path = "src/bin/video_facedetect.rs"
 
 [dependencies]
-opencv = "0.91.3"
+opencv = "0.92.0"
