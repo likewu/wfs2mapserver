@@ -8,7 +8,7 @@ use opencv::{highgui, core, imgcodecs, objdetect, features2d, prelude::*, core::
 };
 
 fn main() -> Result<()> {
-  let window = "video capture";
+  let window = "ORB features";
   highgui::named_window(window, highgui::WINDOW_AUTOSIZE)?;
 
   let img_1_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/1.png");
@@ -25,8 +25,6 @@ fn main() -> Result<()> {
   let mut descriptor = features2d::ORB::create_def()?;
   let mut matcher = features2d::DescriptorMatcher::create("BruteForce-Hamming")?;
 
-  println!("{:?}", "hhhhhhhhhhhhh");
-
   //-- 第一步:检测 Oriented FAST 角点位置
   detector.detect_def(&img_1, &mut keypoints_1);
   detector.detect_def(&img_2, &mut keypoints_2);
@@ -38,7 +36,7 @@ fn main() -> Result<()> {
   let mut outimg1 = Mat::default();
   features2d::draw_keypoints(&img_1, &mut keypoints_1, &mut outimg1, core::Scalar::all(-1 as f64), features2d::DrawMatchesFlags::DEFAULT);
   if outimg1.size()?.width > 0 {
-    highgui::imshow(window, &outimg1)?;
+    highgui::imshow("ORB features", &outimg1)?;
   }
 
   //-- 第三步:对两幅图像中的BRIEF描述子进行匹配，使用 Hamming 距离
@@ -50,7 +48,7 @@ fn main() -> Result<()> {
   let (max, max_index, min, min_index, sum) = matches
                      .iter()
                      .enumerate()
-                     .fold((matches.get(0), 0, matches.get(0), 0, 0.0), |acc, (index,&x)| {
+                     .fold((matches.get(0).unwrap(), 0, matches.get(0).unwrap(), 0, 0.0), |acc, (index,x)| {
                         let max;
                         let min;
                         let max_index;
@@ -74,7 +72,7 @@ fn main() -> Result<()> {
                             min_index = acc.3;
                         }
                         
-                        sum = acc.4.distance + x.distance;
+                        sum = acc.4 + x.distance;
                         
                         (max, max_index, min, min_index, sum)
                      });
@@ -83,6 +81,29 @@ fn main() -> Result<()> {
 
   println!("-- Max dist : {}", max_dist);
   println!("-- Min dist : {}", min_dist);
+
+  //当描述子之间的距离大于两倍的最小距离时,即认为匹配有误.但有时候最小距离会非常小,设置一个经验值30作为下限.
+  let mut good_matches = Vector::<core::DMatch>::new();
+  for i in 0..descriptors_1.rows() {
+    if matches.get(i as usize).unwrap().distance <= f32::max(2.0 * min_dist, 30.0) {
+      good_matches.push(matches.get(i as usize).unwrap());
+    }
+  }
+
+  //-- 第五步:绘制匹配结果
+  let mut img_match = Mat::default();
+  let mut img_goodmatch = Mat::default();
+  features2d::draw_matches_def(&img_1, &mut keypoints_1, &img_2, &mut keypoints_2, &matches, &mut img_match);
+  features2d::draw_matches_def(&img_1, &mut keypoints_1, &img_2, &mut keypoints_2, &good_matches, &mut img_goodmatch);
+  highgui::imshow("all matches", &img_match);
+  highgui::imshow("good matches", &img_goodmatch);
+  
+  loop {
+    let key = highgui::wait_key(10)?;
+    if key > 0 && key != 255 {
+      break;
+    }
+  }
 
   Ok(())
 }
