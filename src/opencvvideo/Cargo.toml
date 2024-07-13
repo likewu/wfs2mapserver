@@ -11,5 +11,41 @@ path = "src/bin/qr.rs"
 name = "video_facedetect"
 path = "src/bin/video_facedetect.rs"
 
+[features]
+blas = ["ndarray-linalg", "linfa/ndarray-linalg"]
+serde = ["serde_crate", "ndarray/serde", "serde_regex"]
+
 [dependencies]
 opencv = "0.92.0"
+
+linfa = { version = "0.7.0" }
+ndarray = { version = "0.15", features = ["approx"] }
+ndarray-linalg = { version = "0.16", optional = true }
+linfa-linalg = { version = "0.1", default-features = false }
+ndarray-stats = "0.5"
+ndarray-rand = { version = "0.14" }
+thiserror = "1.0"
+
+regex = "1.4.5"
+encoding = "0.2"
+
+serde_regex = { version = "1.1", optional = true }
+
+[dependencies.serde_crate]
+package = "serde"
+optional = true
+version = "1.0"
+default-features = false
+features = ["std", "derive"]
+
+[dev-dependencies]
+linfa-datasets = { version = "0.7.0", features = [
+    "diabetes",
+    "winequality",
+] }
+linfa-bayes = { version = "0.7.0" }
+linfa-preprocessing = { version = "0.7.0" }
+curl = "0.4.35"
+tar = "0.4.33"
+linfa = { version = "0.7.0", features = ["benchmarks"] }
+flate2 = "1.0.20"
