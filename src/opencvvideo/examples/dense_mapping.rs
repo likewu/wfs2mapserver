@@ -44,6 +44,7 @@ fn main() -> Result<()> {
   let mut poses_TWC:Vec<Isometry3<f64>>=vec![];
   let mut ref_depth=Mat::new_rows_cols_with_default(height, width, core::CV_64F, core::Scalar::all(1.)).unwrap();
   let ret = readDatasetFiles("E:\\app\\julia\\wfs2map\\src\\opencvvideo\\tests\\test_data", &mut color_image_files, &mut poses_TWC, &mut ref_depth);
+  println!("read total {} files.", color_image_files.len());
 
   // 第一张图
   let ref1 = imgcodecs::imread(&color_image_files[0], imgcodecs::IMREAD_GRAYSCALE)?;
@@ -121,10 +122,11 @@ fn readDatasetFiles(
 }
 
 // 对整个深度图进行更新
-fn update(ref1:&Mat, curr:&Mat, T_C_R:&Isometry3<f64>, depth:&mut Mat, depth_cov2:&mut Mat) -> bool {
+fn update(ref1:&Mat, curr:&Mat, T_C_R:&Isometry3<f64>, depth:&mut Mat, depth_cov2:&mut Mat) {
     for x in boarder..(width - boarder) {
         for y in boarder..(height - boarder) {
             // 遍历每个像素
+            //println!("depth_cov2.at_2d::<f64>(y,x): {}", depth_cov2.at_2d::<f64>(y,x).unwrap());
             if depth_cov2.at_2d::<f64>(y,x).unwrap() < &min_cov || depth_cov2.at_2d::<f64>(y,x).unwrap() > &max_cov // 深度已收敛或发散
                 {continue;}
             // 在极线上搜索 (x,y) 的匹配
@@ -148,7 +150,6 @@ fn update(ref1:&Mat, curr:&Mat, T_C_R:&Isometry3<f64>, depth:&mut Mat, depth_cov
             updateDepthFilter(&Vector2::<f64>::new(x as f64, y as f64), &pt_curr, T_C_R, &epipolar_direction, depth, depth_cov2);
         }
     }
-    true
 }
 
 // 极线搜索
@@ -158,7 +159,8 @@ fn epipolarSearch(
     T_C_R:&Isometry3<f64>, pt_ref:&Vector2<f64>,
     depth_mu:&f64, depth_cov:&f64) -> (Option<Vector2<f64>>, Option<Vector2<f64>>) {
     let mut f_ref = px2cam(pt_ref);
-    f_ref.normalize();
+    //let f_ref = f_ref.try_normalize(0.0).unwrap();
+    let f_ref = f_ref.normalize();
     let P_ref = f_ref.map(|e|{e*depth_mu});    // 参考帧的 P 向量
 
     let px_mean_curr = cam2px(&(T_C_R * P_ref)); // 按深度均值投影的像素
@@ -171,11 +173,10 @@ fn epipolarSearch(
     //println!("px_mean_curr:{} px_min_curr:{} px_max_curr:{} ", px_mean_curr, px_min_curr, px_max_curr);
 
     let mut epipolar_line:Vector2<f64> = px_max_curr - px_min_curr;    // 极线（线段形式）
-    let epipolar_line:Vector2<f64> = match epipolar_line.try_normalize(0.0) {
+    let epipolar_direction:Vector2<f64> = match epipolar_line.try_normalize(0.0) {
         None => Vector2::<f64>::new(0.0,0.0),
         Some(e) => e,
     };
-    let epipolar_line_clone=epipolar_line.clone();
     let mut half_length = 0.5 * epipolar_line.norm();    // 极线线段的半长度
     if half_length>100.0 {half_length = 100.0;}   // 我们不希望搜索太多东西
 
@@ -189,7 +190,8 @@ fn epipolarSearch(
     let mut best_px_curr=None;
     let mut l=-half_length;
     while l<=half_length { // l+=sqrt(2)
-        let px_curr:Vector2<f64> = px_mean_curr + epipolar_line.map(|e|{l*e});  // 待匹配点
+        let px_curr:Vector2<f64> = px_mean_curr + epipolar_direction.map(|e|{l*e});  // 待匹配点
+        l += 0.7;
         if !inside(&px_curr) {
             continue;
         }
@@ -199,12 +201,11 @@ fn epipolarSearch(
             best_ncc = ncc;
             best_px_curr = Some(px_curr);
         }
-        l += 0.7;
     }
     if best_ncc<0.85_f64 {      // 只相信 NCC 很高的匹配
         return (None, None);
     }
-    (best_px_curr, Some(epipolar_line_clone))
+    (best_px_curr, Some(epipolar_direction))
 }
 
 fn NCC(ref1:&Mat, curr:&Mat,
