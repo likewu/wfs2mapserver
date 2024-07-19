@@ -2,14 +2,16 @@
 //#![cfg(ocvrs_has_module_objdetect)]
 
 use std::env;
+use std::fmt::format;
 use std::path::Path;
 use std::str::{self, FromStr};
-use std::fs::{File, OpenOptions};
-use std::io::{Write, BufReader, BufRead, Error};
-use std::ops::Add;
+use std::fs::{File};
+use std::io::{BufReader, BufRead};
 
 use opencv::{highgui, core, imgcodecs, objdetect, features2d, prelude::*, core::Vector, core::KeyPoint, Result};
 use nalgebra::{Matrix2, Point2, Vector2, Vector3, Isometry3, Translation3, UnitQuaternion, Quaternion};
+
+use rand::prelude::*;
 
 /**********************************************
 * 本程序演示了单目相机在已知轨迹下的稠密深度估计
@@ -34,8 +36,8 @@ const max_cov:f64 = 10.0;      // 发散判定：最大方差
 fn main() -> Result<()> {
   let args: Vec<String> = env::args().collect();
 
-  let window = "ORB features";
-  highgui::named_window(window, highgui::WINDOW_AUTOSIZE)?;
+  //let window = "ORB features";
+  //highgui::named_window(window, highgui::WINDOW_AUTOSIZE)?;
 
   // 从数据集读取数据
   let mut color_image_files:Vec<String>=vec![];
@@ -83,10 +85,14 @@ fn readDatasetFiles(
     while 0!=fin.read_line(&mut input).unwrap() {
         // 数据格式：图像文件名 tx, ty, tz, qx, qy, qz, qw ，注意是 TWC 而非 TCW
         let mut words = input.split_whitespace();
+        let cnt=words.clone().count();
+        if cnt>8 {
+            println!("words err:{} ",input);
+        }
         let image=words.next().unwrap();
         let mut data=["";7]; 
-        for i in 1..words.clone().count() {
-          data[i-1]=words.next().unwrap();
+        for i in 0..cnt-1 {
+          data[i]=words.next().unwrap();
         }
 
         color_image_files.push(String::from(path)+"/images/"+image);
@@ -94,6 +100,7 @@ fn readDatasetFiles(
             Isometry3::from_parts(Translation3::new(f64::from_str(data[0]).unwrap(), f64::from_str(data[1]).unwrap(), f64::from_str(data[2]).unwrap()),
                 UnitQuaternion::from_quaternion(Quaternion::new(f64::from_str(data[6]).unwrap(), f64::from_str(data[3]).unwrap(), f64::from_str(data[4]).unwrap(), f64::from_str(data[5]).unwrap())) )
         );
+        input.clear();
     }
 
     // load reference depth
@@ -104,10 +111,11 @@ fn readDatasetFiles(
             //let depth = 0;
             let mut depth = vec![];
             fin.read_until(b' ', &mut depth);
-            let depth=f64::from_str(str::from_utf8(&depth).unwrap()).unwrap();
+            let depth=f64::from_str(str::from_utf8(&depth).unwrap().trim()).unwrap();
             *ref_depth.at_2d_mut::<f64>(y,x).unwrap() = depth / 100.0;
         }
     }
+    println!("last ref_depth:{} ", ref_depth.at_2d::<f64>(height-1,width-1).unwrap());
 
     return true;
 }
@@ -117,7 +125,7 @@ fn update(ref1:&Mat, curr:&Mat, T_C_R:&Isometry3<f64>, depth:&mut Mat, depth_cov
     for x in boarder..(width - boarder) {
         for y in boarder..(height - boarder) {
             // 遍历每个像素
-            if unsafe {*depth_cov2.ptr(y).unwrap().offset(x as isize) as f64} < min_cov || unsafe {*depth_cov2.ptr(y).unwrap().offset(x as isize) as f64} > max_cov // 深度已收敛或发散
+            if depth_cov2.at_2d::<f64>(y,x).unwrap() < &min_cov || depth_cov2.at_2d::<f64>(y,x).unwrap() > &max_cov // 深度已收敛或发散
                 {continue;}
             // 在极线上搜索 (x,y) 的匹配
             let (pt_curr, epipolar_direction) = epipolarSearch(
@@ -125,8 +133,8 @@ fn update(ref1:&Mat, curr:&Mat, T_C_R:&Isometry3<f64>, depth:&mut Mat, depth_cov
                 curr,
                 T_C_R,
                 &Vector2::<f64>::new(x as f64, y as f64),
-                unsafe {&(*depth.ptr(y).unwrap().offset(x as isize) as f64)},
-                unsafe {&(*depth_cov2.ptr(y).unwrap().offset(x as isize) as f64).sqrt()}
+                &depth.at_2d::<f64>(y,x).unwrap(),
+                &depth_cov2.at_2d::<f64>(y,x).unwrap().sqrt()
             );
             let pt_curr=pt_curr.unwrap();
             let epipolar_direction=epipolar_direction.unwrap();
@@ -151,12 +159,16 @@ fn epipolarSearch(
     f_ref.normalize();
     let P_ref = f_ref.map(|e|{e*depth_mu});    // 参考帧的 P 向量
 
-    let px_mean_curr = cam2px(T_C_R * P_ref); // 按深度均值投影的像素
+    let px_mean_curr = cam2px(&(T_C_R * P_ref).clone()); // 按深度均值投影的像素
     let mut d_min = depth_mu - 3.0 * depth_cov;
     let d_max = depth_mu + 3.0 * depth_cov;
     if d_min<0.1 {d_min = 0.1;}
-    let px_min_curr = cam2px(T_C_R * (f_ref * d_min));    // 按最小深度投影的像素
-    let px_max_curr = cam2px(T_C_R * (f_ref * d_max));    // 按最大深度投影的像素
+    let px_min_curr = cam2px(&(T_C_R * (f_ref * d_min)).clone());    // 按最小深度投影的像素
+    let px_max_curr = cam2px(&(T_C_R * (f_ref * d_max)).clone());    // 按最大深度投影的像素
+    
+    //let px_min_curr = cam2px11(&(T_C_R * (f_ref * d_min)));
+    //let px_max_curr = cam2px11(&(T_C_R * (f_ref * d_max)));
+    println!("px_mean_curr:{} px_min_curr:{} px_max_curr:{} ", px_mean_curr, px_min_curr, px_max_curr);
 
     let epipolar_line = px_max_curr - px_min_curr;    // 极线（线段形式）
     let mut epipolar_line = epipolar_line.normalize();
@@ -200,7 +212,7 @@ fn NCC(ref1:&Mat, curr:&Mat,
     let mut values_curr:Vec<f64>=vec![]; // 参考帧和当前帧的均值
     for x in -ncc_window_size..=ncc_window_size {
         for y in -ncc_window_size..=ncc_window_size {
-            let value_ref:f64 = unsafe {*ref1.ptr(y + pt_ref[1] as i32).unwrap().offset(x as isize + pt_ref[0] as isize) as f64} / 255.0;
+            let value_ref:f64 = ref1.at_2d::<f64>(y + pt_ref[1] as i32,x + pt_ref[0] as i32).unwrap() / 255.0;
             mean_ref += value_ref;
 
             let value_curr = getBilinearInterpolatedValue(curr, pt_curr + &Vector2::<f64>::new(x as f64, y as f64));
@@ -295,19 +307,19 @@ fn plotDepth(depth_truth:&Mat, depth_estimate:&Mat) {
     highgui::imshow("depth_truth", &(depth_truth * 0.4).into_result().unwrap().to_mat().unwrap());
     highgui::imshow("depth_estimate", &(depth_estimate * 0.4).into_result().unwrap().to_mat().unwrap());
     highgui::imshow("depth_error", &(depth_truth - depth_estimate).into_result().unwrap().to_mat().unwrap());
-    highgui::wait_key(1);
+    let _ = highgui::wait_key(1);
 }
 
 fn evaludateDepth(depth_truth:&Mat, depth_estimate:&Mat) {
     let mut ave_depth_error = 0.0;     // 平均误差
     let mut ave_depth_error_sq = 0.0;      // 平方误差
     let mut cnt_depth_data = 0;
-    for y in boarder..(depth_truth.rows - boarder) {
-        for x in boarder..(depth_truth.cols - boarder) {
+    for y in boarder..(depth_truth.rows() - boarder) {
+        for x in boarder..(depth_truth.cols() - boarder) {
             let error = depth_truth.at_2d::<f64>(y as i32,x as i32).unwrap() - depth_estimate.at_2d::<f64>(y as i32,x as i32).unwrap();
             ave_depth_error += error;
             ave_depth_error_sq += error * error;
-            cnt_depth_data++;
+            cnt_depth_data+=1;
         }
     }
     ave_depth_error /= cnt_depth_data as f64;
@@ -331,20 +343,28 @@ fn getBilinearInterpolatedValue(img:&Mat, pt:Vector2::<f64>) -> f64 {
 // 像素到相机坐标系
 #[inline]
 fn px2cam(px:&Vector2<f64>) -> Vector3<f64> {
-    return Vector3::<f64>::new(
+    Vector3::<f64>::new(
         (px[0] - cx) / fx,
         (px[1] - cy) / fy,
         1.0
-    );
+    )
 }
 
 // 相机坐标系到像素
 #[inline]
-fn cam2px(p_cam:Vector3<f64>) -> Vector2<f64> {
-    return Vector2::<f64>::new(
+fn cam2px(p_cam:&Vector3<f64>) -> Vector2<f64> {
+    println!("p_cam: {} ", p_cam);
+    Vector2::<f64>::new(
         p_cam[0] * fx / p_cam[2] + cx,
         p_cam[1] * fy / p_cam[2] + cy
-    );
+    )
+}
+fn cam2px11(p_cam:&Vector3<f64>) -> Vector2<f64> {
+    let mut rng=rand::thread_rng();
+    Vector2::<f64>::new(
+        1.0,
+        rng.gen()
+    )
 }
 
 // 检测一个点是否在图像边框内

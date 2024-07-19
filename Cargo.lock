@@ -2394,6 +2394,7 @@ dependencies = [
  "ndarray-rand",
  "ndarray-stats",
  "opencv",
+ "rand",
  "regex",
  "serde",
  "serde_regex",
