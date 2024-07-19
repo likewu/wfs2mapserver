@@ -15,6 +15,17 @@ $env:OPENCV_INCLUDE_PATHS = "D:\Programs\opencv\build\include"
 
 cargo test -p opencvvideo orb
 cargo run -p opencvvideo --example orb
+lldb-server gdbserver *:1234 ./target/debug/examples/dense_mapping.exe
+//*
+
+lldb-server platform --server --listen "*:1234"
+(lldb) platform select remote-linux
+(lldb) platform connect connect://remote:1234
+(lldb) file a.out
+(lldb) run
+(lldb) platform settings -w /usr/local/bin
+(lldb) platform status
+//*
 
 HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment
 

@@ -58,7 +58,7 @@ fn main() -> Result<()> {
       let pose_curr_TWC = poses_TWC[index];
       let pose_T_C_R = pose_curr_TWC.inverse() * pose_ref_TWC;   // 坐标转换关系： T_C_W * T_W_R = T_C_R
       update(&ref1, &curr, &pose_T_C_R, &mut depth, &mut depth_cov2);
-      //evaludateDepth(ref_depth, depth);
+      evaludateDepth(&ref_depth, &depth);
       plotDepth(&ref_depth, &depth);
       highgui::imshow("image", &curr);
       highgui::wait_key(1);
@@ -298,22 +298,23 @@ fn plotDepth(depth_truth:&Mat, depth_estimate:&Mat) {
     highgui::wait_key(1);
 }
 
-/*void evaludateDepth(const Mat &depth_truth, const Mat &depth_estimate) {
-    double ave_depth_error = 0;     // 平均误差
-    double ave_depth_error_sq = 0;      // 平方误差
-    int cnt_depth_data = 0;
-    for (int y = boarder; y < depth_truth.rows - boarder; y++)
-        for (int x = boarder; x < depth_truth.cols - boarder; x++) {
-            double error = depth_truth.ptr<double>(y)[x] - depth_estimate.ptr<double>(y)[x];
+fn evaludateDepth(depth_truth:&Mat, depth_estimate:&Mat) {
+    let mut ave_depth_error = 0.0;     // 平均误差
+    let mut ave_depth_error_sq = 0.0;      // 平方误差
+    let mut cnt_depth_data = 0;
+    for y in boarder..(depth_truth.rows - boarder) {
+        for x in boarder..(depth_truth.cols - boarder) {
+            let error = depth_truth.at_2d::<f64>(y as i32,x as i32).unwrap() - depth_estimate.at_2d::<f64>(y as i32,x as i32).unwrap();
             ave_depth_error += error;
             ave_depth_error_sq += error * error;
             cnt_depth_data++;
         }
-    ave_depth_error /= cnt_depth_data;
-    ave_depth_error_sq /= cnt_depth_data;
+    }
+    ave_depth_error /= cnt_depth_data as f64;
+    ave_depth_error_sq /= cnt_depth_data as f64;
 
-    cout << "Average squared error = " << ave_depth_error_sq << ", average error: " << ave_depth_error << endl;
-}*/
+    println!("Average squared error = {}, average error: {}", ave_depth_error_sq, ave_depth_error);
+}
 
 // 双线性灰度插值
 #[inline]
@@ -353,3 +354,36 @@ fn inside(pt:&Vector2<f64>) -> bool {
   return pt[0] >= boarder1 && pt[1] >= boarder1
          && pt[0] + boarder1 < width as f64 && pt[1] + boarder1 <= height as f64;
 }
+
+/*
+void showEpipolarMatch(const Mat &ref, const Mat &curr, const Vector2d &px_ref, const Vector2d &px_curr) {
+    Mat ref_show, curr_show;
+    cv::cvtColor(ref, ref_show, CV_GRAY2BGR);
+    cv::cvtColor(curr, curr_show, CV_GRAY2BGR);
+
+    cv::circle(ref_show, cv::Point2f(px_ref(0, 0), px_ref(1, 0)), 5, cv::Scalar(0, 0, 250), 2);
+    cv::circle(curr_show, cv::Point2f(px_curr(0, 0), px_curr(1, 0)), 5, cv::Scalar(0, 0, 250), 2);
+
+    imshow("ref", ref_show);
+    imshow("curr", curr_show);
+    waitKey(1);
+}
+
+void showEpipolarLine(const Mat &ref, const Mat &curr, const Vector2d &px_ref, const Vector2d &px_min_curr,
+                      const Vector2d &px_max_curr) {
+
+    Mat ref_show, curr_show;
+    cv::cvtColor(ref, ref_show, CV_GRAY2BGR);
+    cv::cvtColor(curr, curr_show, CV_GRAY2BGR);
+
+    cv::circle(ref_show, cv::Point2f(px_ref(0, 0), px_ref(1, 0)), 5, cv::Scalar(0, 255, 0), 2);
+    cv::circle(curr_show, cv::Point2f(px_min_curr(0, 0), px_min_curr(1, 0)), 5, cv::Scalar(0, 255, 0), 2);
+    cv::circle(curr_show, cv::Point2f(px_max_curr(0, 0), px_max_curr(1, 0)), 5, cv::Scalar(0, 255, 0), 2);
+    cv::line(curr_show, Point2f(px_min_curr(0, 0), px_min_curr(1, 0)), Point2f(px_max_curr(0, 0), px_max_curr(1, 0)),
+             Scalar(0, 255, 0), 1);
+
+    imshow("ref", ref_show);
+    imshow("curr", curr_show);
+    waitKey(1);
+}
+*/
