@@ -5,23 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Attach",
-            "type": "lldb",
-            "request": "attach",
-            //"program": "${workspaceFolder}/target/debug/examples/dense_mapping"
-            "pid": "12372"
-        },
-        {
             "name": "Remote launch",
             "type": "lldb",
             "request": "launch",
             "program": "${workspaceFolder}/target/debug/examples/dense_mapping.exe", // Local path.
             "args": [],
-            "cwd": "${workspaceFolder}",
+            //"cwd": "${workspaceFolder}",
             "initCommands": [
-                "platform select remote-linux", // For example: 'remote-linux', 'remote-macosx', 'remote-android', etc.
-                "platform connect connect://local:1234",
-                "settings set target.inherit-env false",
+                "platform select remote-windows", // For example: 'remote-linux', 'remote-macosx', 'remote-android', etc.
+                "platform connect connect://localhost:1234",
+                //"settings set target.inherit-env false",
             ],
             "env": {
                 "PATH11": "...",
