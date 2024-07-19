@@ -136,9 +136,11 @@ fn update(ref1:&Mat, curr:&Mat, T_C_R:&Isometry3<f64>, depth:&mut Mat, depth_cov
                 &depth.at_2d::<f64>(y,x).unwrap(),
                 &depth_cov2.at_2d::<f64>(y,x).unwrap().sqrt()
             );
+            if let None=pt_curr // 匹配失败
+                {continue;}
             let pt_curr=pt_curr.unwrap();
             let epipolar_direction=epipolar_direction.unwrap();
-
+                
             // 取消该注释以显示匹配
             // showEpipolarMatch(ref, curr, Vector2d(x, y), pt_curr);
 
@@ -159,21 +161,25 @@ fn epipolarSearch(
     f_ref.normalize();
     let P_ref = f_ref.map(|e|{e*depth_mu});    // 参考帧的 P 向量
 
-    let px_mean_curr = cam2px(&(T_C_R * P_ref).clone()); // 按深度均值投影的像素
+    let px_mean_curr = cam2px(&(T_C_R * P_ref)); // 按深度均值投影的像素
     let mut d_min = depth_mu - 3.0 * depth_cov;
     let d_max = depth_mu + 3.0 * depth_cov;
     if d_min<0.1 {d_min = 0.1;}
-    let px_min_curr = cam2px(&(T_C_R * (f_ref * d_min)).clone());    // 按最小深度投影的像素
-    let px_max_curr = cam2px(&(T_C_R * (f_ref * d_max)).clone());    // 按最大深度投影的像素
+    let px_min_curr = cam2px(&(T_C_R * (f_ref * d_min)));    // 按最小深度投影的像素
+    let px_max_curr = cam2px(&(T_C_R * (f_ref * d_max)));    // 按最大深度投影的像素
     
-    //let px_min_curr = cam2px11(&(T_C_R * (f_ref * d_min)));
-    //let px_max_curr = cam2px11(&(T_C_R * (f_ref * d_max)));
-    println!("px_mean_curr:{} px_min_curr:{} px_max_curr:{} ", px_mean_curr, px_min_curr, px_max_curr);
+    //println!("px_mean_curr:{} px_min_curr:{} px_max_curr:{} ", px_mean_curr, px_min_curr, px_max_curr);
 
-    let epipolar_line = px_max_curr - px_min_curr;    // 极线（线段形式）
-    let mut epipolar_line = epipolar_line.normalize();
+    let mut epipolar_line:Vector2<f64> = px_max_curr - px_min_curr;    // 极线（线段形式）
+    let epipolar_line:Vector2<f64> = match epipolar_line.try_normalize(0.0) {
+        None => Vector2::<f64>::new(0.0,0.0),
+        Some(e) => e,
+    };
+    let epipolar_line_clone=epipolar_line.clone();
     let mut half_length = 0.5 * epipolar_line.norm();    // 极线线段的半长度
     if half_length>100.0 {half_length = 100.0;}   // 我们不希望搜索太多东西
+
+    //println!("epipolar_line.norm:{} {} {}", epipolar_line.norm(), epipolar_line, Vector2::<f64>::new(0.0,0.0).normalize().norm());
 
     // 取消此句注释以显示极线（线段）
     // showEpipolarLine( ref, curr, pt_ref, px_min_curr, px_max_curr );
@@ -183,8 +189,7 @@ fn epipolarSearch(
     let mut best_px_curr=None;
     let mut l=-half_length;
     while l<=half_length { // l+=sqrt(2)
-        epipolar_line.map(|e|{l*e});
-        let px_curr:Vector2<f64> = px_mean_curr + epipolar_line;  // 待匹配点
+        let px_curr:Vector2<f64> = px_mean_curr + epipolar_line.map(|e|{l*e});  // 待匹配点
         if !inside(&px_curr) {
             continue;
         }
@@ -199,7 +204,7 @@ fn epipolarSearch(
     if best_ncc<0.85_f64 {      // 只相信 NCC 很高的匹配
         return (None, None);
     }
-    (best_px_curr, Some(epipolar_line))
+    (best_px_curr, Some(epipolar_line_clone))
 }
 
 fn NCC(ref1:&Mat, curr:&Mat,
@@ -353,17 +358,10 @@ fn px2cam(px:&Vector2<f64>) -> Vector3<f64> {
 // 相机坐标系到像素
 #[inline]
 fn cam2px(p_cam:&Vector3<f64>) -> Vector2<f64> {
-    println!("p_cam: {} ", p_cam);
+    //println!("p_cam: {} ", p_cam);
     Vector2::<f64>::new(
         p_cam[0] * fx / p_cam[2] + cx,
         p_cam[1] * fy / p_cam[2] + cy
-    )
-}
-fn cam2px11(p_cam:&Vector3<f64>) -> Vector2<f64> {
-    let mut rng=rand::thread_rng();
-    Vector2::<f64>::new(
-        1.0,
-        rng.gen()
     )
 }
 
