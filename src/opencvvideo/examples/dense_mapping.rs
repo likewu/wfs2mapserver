@@ -273,8 +273,8 @@ fn updateDepthFilter(
     let b:Vector2<f64> = Vector2::<f64>::new(t.dot(&f_ref), t.dot(&f2));
     let mut A:Matrix2<f64>=Default::default();
     A[(0, 0)] = f_ref.dot(&f_ref);
-    A[(0, 1)] = -f_ref.dot(&f2);
-    A[(1, 0)] = -A[(0, 1)];
+    A[(1, 0)] = -f_ref.dot(&f2);
+    A[(0, 1)] = -A[(1, 0)];
     A[(1, 1)] = -f2.dot(&f2);
     let ans:Vector2<f64> = A.try_inverse().unwrap() * b;
     let xm:Vector3<f64> = ans[0] * f_ref;           // ref 侧的结果
