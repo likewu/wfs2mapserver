@@ -58,6 +58,8 @@ fn main() -> Result<()> {
       println!("*** loop {} ***", index);
       let curr = imgcodecs::imread(&color_image_files[index], imgcodecs::IMREAD_GRAYSCALE)?;
       if curr.data().is_null() {continue;}
+      //let mut curr11=Mat::default();
+      //curr.convert_to_def(curr11, core::CV_64FC1);
       let pose_curr_TWC = poses_TWC[index];
       let pose_T_C_R = pose_curr_TWC.inverse() * pose_ref_TWC;   // 坐标转换关系： T_C_W * T_W_R = T_C_R
       update(&ref1, &curr, &pose_T_C_R, &mut depth, &mut depth_cov2);
@@ -218,7 +220,7 @@ fn NCC(ref1:&Mat, curr:&Mat,
     let mut values_curr:Vec<f64>=vec![]; // 参考帧和当前帧的均值
     for x in -ncc_window_size..=ncc_window_size {
         for y in -ncc_window_size..=ncc_window_size {
-            let value_ref:f64 = ref1.at_2d::<f64>(y + pt_ref[1] as i32,x + pt_ref[0] as i32).unwrap() / 255.0;
+            let value_ref:f64 = (*ref1.at_2d::<u8>(y + pt_ref[1] as i32,x + pt_ref[0] as i32).unwrap() as f64) / 255.0;
             mean_ref += value_ref;
 
             let value_curr = getBilinearInterpolatedValue(curr, pt_curr + &Vector2::<f64>::new(x as f64, y as f64));
@@ -242,7 +244,7 @@ fn NCC(ref1:&Mat, curr:&Mat,
         demoniator1 += (values_ref[i] - mean_ref) * (values_ref[i] - mean_ref);
         demoniator2 += (values_curr[i] - mean_curr) * (values_curr[i] - mean_curr);
     }
-    return numerator / (demoniator1 * demoniator2 + 1.0E-10).sqrt();   // 防止分母出现零
+    numerator / (demoniator1 * demoniator2 + 1.0E-10).sqrt()   // 防止分母出现零
 }
 
 fn updateDepthFilter(
