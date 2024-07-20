@@ -276,7 +276,11 @@ fn updateDepthFilter(
     A[(1, 0)] = -f_ref.dot(&f2);
     A[(0, 1)] = -A[(1, 0)];
     A[(1, 1)] = -f2.dot(&f2);
-    let ans:Vector2<f64> = A.try_inverse().unwrap() * b;
+    let inv=match A.try_inverse() {
+      None => A.pseudo_inverse(0.0).unwrap(),
+      Some(e) => e
+    };
+    let ans:Vector2<f64> = inv * b;
     let xm:Vector3<f64> = ans[0] * f_ref;           // ref 侧的结果
     let xn:Vector3<f64> = t + ans[1] * f2;          // cur 结果
     let p_esti:Vector3<f64> = (xm + xn) / 2.0;      // P的位置，取两者的平均
