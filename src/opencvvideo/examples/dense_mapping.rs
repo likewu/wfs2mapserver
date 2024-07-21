@@ -36,9 +36,6 @@ const max_cov:f64 = 10.0;      // 发散判定：最大方差
 fn main() -> Result<()> {
   let args: Vec<String> = env::args().collect();
 
-  //let window = "ORB features";
-  //highgui::named_window(window, highgui::WINDOW_AUTOSIZE)?;
-
   // 从数据集读取数据
   let mut color_image_files:Vec<String>=vec![];
   let mut poses_TWC:Vec<Isometry3<f64>>=vec![];
@@ -118,7 +115,7 @@ fn readDatasetFiles(
             *ref_depth.at_2d_mut::<f64>(y,x).unwrap() = depth / 100.0;
         }
     }
-    println!("last ref_depth:{} ", ref_depth.at_2d::<f64>(height-1,width-1).unwrap());
+    //println!("last ref_depth:{} ", ref_depth.at_2d::<f64>(height-1,width-1).unwrap());
 
     return true;
 }
