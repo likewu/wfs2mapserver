@@ -3,6 +3,10 @@
 use std::fs::File;
 use std::io::BufReader;
 
+use nalgebra::{Vector2, Vector3, UnitQuaternion, Quaternion};
+
+pub mod rotation;
+
 /// 从文件读入BAL dataset
 struct BALProblem {
     num_cameras_:i32,
@@ -11,10 +15,10 @@ struct BALProblem {
     num_parameters_:i32,
     use_quaternions_:bool,
 
-    point_index_:&i32,      // 每个observation对应的point index
-    camera_index_:&i32,     // 每个observation对应的camera index
-    observations_:&f64,
-    parameters_:&f64,
+    point_index_:&[i32],      // 每个observation对应的point index
+    camera_index_:&[i32],     // 每个observation对应的camera index
+    observations_:&[f64],
+    parameters_:&[f64],
 }
 
 impl BALProblem {
@@ -29,64 +33,70 @@ impl BALProblem {
     };*/
 
     // This wil die horribly on invalid files. Them's the breaks.
-    let mut num_cameras_ = [0u8;4];
-    fptr.read(&mut num_cameras_);
-    let num_cameras_=i32::from_str(str::from_utf8(&num_cameras_).unwrap().trim()).unwrap()
-    let mut num_points_ = [0u8;4];
-    fptr.read(&mut num_points_);
-    let num_points_=i32::from_str(str::from_utf8(&num_points_).unwrap().trim()).unwrap()
-    let mut num_observations_ = [0u8;4];
-    fptr.read(&mut num_observations_);
-    let num_observations_=i32::from_str(str::from_utf8(&num_observations_).unwrap().trim()).unwrap()
-
+    let mut num_cameras_ = vec![];
+    fptr.read_until(b' ', &mut num_cameras_);
+    let num_cameras_=i32::from_str(str::from_utf8(&num_cameras_).unwrap().trim()).unwrap();
+    let mut num_points_ = vec![];
+    fptr.read_until(b' ', &mut num_points_);
+    let num_points_=i32::from_str(str::from_utf8(&num_points_).unwrap().trim()).unwrap();
+    let mut num_observations_ = vec![];
+    fptr.read_until(b' ', &mut num_observations_);
+    let num_observations_=i32::from_str(str::from_utf8(&num_observations_).unwrap().trim()).unwrap();
+    
     println!("Header: {} {} {}", num_cameras_, num_points_, num_observations_);
 
     let mut point_index_ = [0; num_observations_];
     let mut camera_index_ = [0; num_observations_];
     let mut observations_ = [0.0; 2 * num_observations_];
 
-    let num_parameters_ = 9 * num_cameras_ + 3 * num_points_;
+    let mut num_parameters_ = 9 * num_cameras_ + 3 * num_points_;
     let mut parameters_ = [0.0;num_parameters_];
 
     for i in 0..num_observations_ {
-        let mut tmpdata = [0u8;4];
-        fptr.read(&mut tmpdata);
-        camera_index_[i]=i32::from_str(str::from_utf8(&tmpdata).unwrap().trim()).unwrap()
-        let mut tmpdata = [0u8;4];
-        fptr.read(&mut tmpdata);
+        let mut tmpdata = vec![];
+        fptr.read_until(b' ', &mut tmpdata);
+        camera_index_[i]=i32::from_str(str::from_utf8(&tmpdata).unwrap().trim()).unwrap();
+    
+        let mut tmpdata = vec![];
+        fptr.read_until(b' ', &mut tmpdata);
         point_index_[i]=i32::from_str(str::from_utf8(&tmpdata).unwrap().trim()).unwrap()
         
         for j in 0..2 {
-            FscanfOrDie(fptr, "%lf", observations_ + 2 * i + j);
+          let mut tmpdata = vec![];
+          fptr.read_until(b' ', &mut tmpdata);
+          observations_[2 * i + j]=f64::from_str(str::from_utf8(&tmpdata).unwrap().trim()).unwrap()
         }
     }
 
     for i in 0..num_parameters_ {
-        FscanfOrDie(fptr, "%lf", parameters_ + i);
+      let mut tmpdata = vec![];
+      fptr.read_until(b' ', &mut tmpdata);
+      parameters_[i]=f64::from_str(str::from_utf8(&tmpdata).unwrap().trim()).unwrap()
     }
 
     let use_quaternions_ = use_quaternions;
     if use_quaternions {
         // Switch the angle-axis rotations to quaternions.
         num_parameters_ = 10 * num_cameras_ + 3 * num_points_;
-        double *quaternion_parameters = new double[num_parameters_];
-        double *original_cursor = parameters_;
-        double *quaternion_cursor = quaternion_parameters;
-        for (int i = 0; i < num_cameras_; ++i) {
-            AngleAxisToQuaternion(original_cursor, quaternion_cursor);
+        let mut quaternion_parameters = [0.0;num_parameters_];
+        let mut original_cursor = 0;
+        let mut quaternion_cursor = 0;
+        for i in 0..num_cameras_ {
+            rotation::AngleAxisToQuaternion(parameters_[original_cursor..original_cursor+3], quaternion_parameters[quaternion_cursor..quaternion_cursor+4]);
             quaternion_cursor += 4;
             original_cursor += 3;
-            for (int j = 4; j < 10; ++j) {
-                *quaternion_cursor++ = *original_cursor++;
+            for j in 4..10 {
+                quaternion_parameters[quaternion_cursor] = parameters_original_cursor];
+                quaternion_cursor+=1;
+                original_cursor+=1;
             }
         }
         // Copy the rest of the points.
-        for (int i = 0; i < 3 * num_points_; ++i) {
-            *quaternion_cursor++ = *original_cursor++;
+        for i in 0..3 * num_points_ {
+            quaternion_parameters[quaternion_cursor] = parameters_original_cursor];
+            quaternion_cursor+=1;
+            original_cursor+=1;
         }
-        // Swap in the quaternion parameters.
-        delete[]parameters_;
-        parameters_ = quaternion_parameters;
     }
 
     Self {
@@ -98,55 +108,54 @@ impl BALProblem {
         point_index_,
         camera_index_,
         observations_,
-        parameters_,
+        parameters_:if use_quaternions {quaternion_parameters} else {parameters_},
     }
   }
 
-  fn BALProblem::WriteToFile(const std::string &filename) const {
-    FILE *fptr = fopen(filename.c_str(), "w");
+  fn WriteToFile(filename:&str) {
+    let input = File::open(filename).unwrap();
+    let mut fptr = BufWriter::new(input);
 
-    if (fptr == NULL) {
+    /*if (fptr == NULL) {
         std::cerr << "Error: unable to open file " << filename;
         return;
-    }
+    }*/
 
     fprintf(fptr, "%d %d %d %d\n", num_cameras_, num_cameras_, num_points_, num_observations_);
 
-    for (int i = 0; i < num_observations_; ++i) {
+    for i in 0..num_observations_ {
         fprintf(fptr, "%d %d", camera_index_[i], point_index_[i]);
-        for (int j = 0; j < 2; ++j) {
+        for j in 0..2 {
             fprintf(fptr, " %g", observations_[2 * i + j]);
         }
         fprintf(fptr, "\n");
     }
 
-    for (int i = 0; i < num_cameras(); ++i) {
+    for i in 0..num_cameras() {
         double angleaxis[9];
-        if (use_quaternions_) {
+        if use_quaternions_ {
             //OutPut in angle-axis format.
             QuaternionToAngleAxis(parameters_ + 10 * i, angleaxis);
             memcpy(angleaxis + 3, parameters_ + 10 * i + 4, 6 * sizeof(double));
         } else {
             memcpy(angleaxis, parameters_ + 9 * i, 9 * sizeof(double));
         }
-        for (int j = 0; j < 9; ++j) {
+        for j in 0..9 {
             fprintf(fptr, "%.16g\n", angleaxis[j]);
         }
     }
 
     const double *points = parameters_ + camera_block_size() * num_cameras_;
-    for (int i = 0; i < num_points(); ++i) {
+    for i in 0..num_points() {
         const double *point = points + i * point_block_size();
-        for (int j = 0; j < point_block_size(); ++j) {
+        for j in 0..point_block_size() {
             fprintf(fptr, "%.16g\n", point[j]);
         }
     }
-
-    fclose(fptr);
   }
 
   // Write the problem to a PLY file for inspection in Meshlab or CloudCompare
-  fn BALProblem::WriteToPLYFile(const std::string &filename) const {
+  fn WriteToPLYFile(const std::string &filename) {
     std::ofstream of(filename.c_str());
 
     of << "ply"
@@ -163,7 +172,7 @@ impl BALProblem {
     // Export extrinsic data (i.e. camera centers) as green points.
     double angle_axis[3];
     double center[3];
-    for (int i = 0; i < num_cameras(); ++i) {
+    for i in 0..num_cameras() {
         const double *camera = cameras() + camera_block_size() * i;
         CameraToAngelAxisAndCenter(camera, angle_axis, center);
         of << center[0] << ' ' << center[1] << ' ' << center[2]
@@ -172,21 +181,20 @@ impl BALProblem {
 
     // Export the structure (i.e. 3D Points) as white points.
     const double *points = parameters_ + camera_block_size() * num_cameras_;
-    for (int i = 0; i < num_points(); ++i) {
+    for i in 0..num_points() {
         const double *point = points + i * point_block_size();
         for (int j = 0; j < point_block_size(); ++j) {
             of << point[j] << ' ';
         }
         of << " 255 255 255\n";
     }
-    of.close();
   }
 
-  fn BALProblem::CameraToAngelAxisAndCenter(const double *camera,
+  fn CameraToAngelAxisAndCenter(const double *camera,
                                             double *angle_axis,
-                                            double *center) const {
+                                            double *center) {
     VectorRef angle_axis_ref(angle_axis, 3);
-    if (use_quaternions_) {
+    if use_quaternions_ {
         QuaternionToAngleAxis(camera, angle_axis);
     } else {
         angle_axis_ref = ConstVectorRef(camera, 3);
@@ -200,11 +208,11 @@ impl BALProblem {
     VectorRef(center, 3) *= -1.0;
   }
 
-  fn BALProblem::AngleAxisAndCenterToCamera(const double *angle_axis,
+  fn AngleAxisAndCenterToCamera(const double *angle_axis,
                                             const double *center,
                                             double *camera) const {
     ConstVectorRef angle_axis_ref(angle_axis, 3);
-    if (use_quaternions_) {
+    if use_quaternions_ {
         AngleAxisToQuaternion(angle_axis, camera);
     } else {
         VectorRef(camera, 3) = angle_axis_ref;
@@ -215,19 +223,19 @@ impl BALProblem {
     VectorRef(camera + camera_block_size() - 6, 3) *= -1.0;
   }
 
-  fn BALProblem::Normalize() {
+  fn Normalize() {
     // Compute the marginal median of the geometry
     std::vector<double> tmp(num_points_);
     Eigen::Vector3d median;
     double *points = mutable_points();
-    for (int i = 0; i < 3; ++i) {
-        for (int j = 0; j < num_points_; ++j) {
+    for i in 0..3 {
+        for j in 0..num_points_ {
             tmp[j] = points[3 * j + i];
         }
         median(i) = Median(&tmp);
     }
 
-    for (int i = 0; i < num_points_; ++i) {
+    for i in 0..num_points_ {
         VectorRef point(points + 3 * i, 3);
         tmp[i] = (point - median).lpNorm<1>();
     }
@@ -240,7 +248,7 @@ impl BALProblem {
     const double scale = 100.0 / median_absolute_deviation;
 
     // X = scale * (X - median)
-    for (int i = 0; i < num_points_; ++i) {
+    for i in 0..num_points_ {
         VectorRef point(points + 3 * i, 3);
         point = scale * (point - median);
     }
@@ -248,7 +256,7 @@ impl BALProblem {
     double *cameras = mutable_cameras();
     double angle_axis[3];
     double center[3];
-    for (int i = 0; i < num_cameras_; ++i) {
+    for i in 0..num_cameras_ {
         double *camera = cameras + camera_block_size() * i;
         CameraToAngelAxisAndCenter(camera, angle_axis, center);
         // center = scale * (center - median)
@@ -257,7 +265,7 @@ impl BALProblem {
     }
   }
 
-  fn BALProblem::Perturb(const double rotation_sigma,
+  fn Perturb(const double rotation_sigma,
                          const double translation_sigma,
                          const double point_sigma) {
     assert(point_sigma >= 0.0);
@@ -265,13 +273,13 @@ impl BALProblem {
     assert(translation_sigma >= 0.0);
 
     double *points = mutable_points();
-    if (point_sigma > 0) {
-        for (int i = 0; i < num_points_; ++i) {
+    if point_sigma > 0 {
+        for i in 0..num_points_ {
             PerturbPoint3(point_sigma, points + 3 * i);
         }
     }
 
-    for (int i = 0; i < num_cameras_; ++i) {
+    for i in 0..num_cameras_ {
         double *camera = mutable_cameras() + camera_block_size() * i;
 
         double angle_axis[3];
@@ -284,7 +292,7 @@ impl BALProblem {
         }
         AngleAxisAndCenterToCamera(angle_axis, center, camera);
 
-        if (translation_sigma > 0.0)
+        if translation_sigma > 0.0
             PerturbPoint3(translation_sigma, camera + camera_block_size() - 6);
     }
   }
