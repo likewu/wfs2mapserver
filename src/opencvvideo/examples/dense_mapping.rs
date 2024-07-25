@@ -5,7 +5,7 @@ use std::env;
 use std::fmt::format;
 use std::path::Path;
 use std::str::{self, FromStr};
-use std::fs::{File};
+use std::fs::File;
 use std::io::{BufReader, BufRead};
 
 use opencv::{highgui, core, imgcodecs, objdetect, features2d, prelude::*, core::Vector, core::KeyPoint, Result};

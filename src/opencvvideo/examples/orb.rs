@@ -3,8 +3,8 @@
 
 use std::path::Path;
 
-use opencv::{highgui, core, imgcodecs, objdetect, features2d, prelude::*, core::Vector, core::KeyPoint, Result
-  
+use opencv::{highgui, core, imgcodecs, objdetect, features2d, prelude::*, Result,
+  core::{Vector, KeyPoint, Scalar, DMatch}
 };
 
 fn main() -> Result<()> {
@@ -34,13 +34,13 @@ fn main() -> Result<()> {
   descriptor.compute(&img_2, &mut keypoints_2, &mut descriptors_2);
 
   let mut outimg1 = Mat::default();
-  features2d::draw_keypoints(&img_1, &mut keypoints_1, &mut outimg1, core::Scalar::all(-1 as f64), features2d::DrawMatchesFlags::DEFAULT);
+  features2d::draw_keypoints(&img_1, &mut keypoints_1, &mut outimg1, Scalar::all(-1 as f64), features2d::DrawMatchesFlags::DEFAULT);
   if outimg1.size()?.width > 0 {
     highgui::imshow("ORB features", &outimg1)?;
   }
 
   //-- 第三步:对两幅图像中的BRIEF描述子进行匹配，使用 Hamming 距离
-  let mut matches = Vector::<core::DMatch>::new();
+  let mut matches = Vector::<DMatch>::new();
   matcher.train_match_def(&descriptors_1, &descriptors_2, &mut matches);
 
   //-- 第四步:匹配点对筛选
@@ -83,7 +83,7 @@ fn main() -> Result<()> {
   println!("-- Min dist : {}", min_dist);
 
   //当描述子之间的距离大于两倍的最小距离时,即认为匹配有误.但有时候最小距离会非常小,设置一个经验值30作为下限.
-  let mut good_matches = Vector::<core::DMatch>::new();
+  let mut good_matches = Vector::<DMatch>::new();
   for i in 0..descriptors_1.rows() {
     if matches.get(i as usize).unwrap().distance <= f32::max(2.0 * min_dist, 30.0) {
       good_matches.push(matches.get(i as usize).unwrap());
