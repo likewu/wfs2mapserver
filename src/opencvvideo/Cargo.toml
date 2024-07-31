@@ -37,6 +37,7 @@ nalgebra = "0.32.5"
 ceres_solver = "0.3.0"
 
 rand = "0.8.5"
+pdqselect = "0.1.1"
 
 [dependencies.serde_crate]
 package = "serde"

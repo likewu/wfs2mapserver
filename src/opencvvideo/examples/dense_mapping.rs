@@ -11,8 +11,6 @@ use std::io::{BufReader, BufRead};
 use opencv::{highgui, core, imgcodecs, objdetect, features2d, prelude::*, core::Vector, core::KeyPoint, Result};
 use nalgebra::{Matrix2, Point2, Vector2, Vector3, Isometry3, Translation3, UnitQuaternion, Quaternion};
 
-use rand::prelude::*;
-
 /**********************************************
 * 本程序演示了单目相机在已知轨迹下的稠密深度估计
 * 使用极线搜索 + NCC 匹配的方式，与书本的 12.2 节对应

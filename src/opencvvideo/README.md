@@ -30,3 +30,6 @@ lldb-server platform --server --listen "*:1234"
 HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment
 
 计算机\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\UsoSvc
+
+
+https://kkgithub.com/gigahidjrikaaa/Engineering-Books/blob/main/Computer Vision/Kaehler%2C Bradski - Learning OpenCV 3 Computer Vision in C%2B%2B With the OpenCV Library.pdf?raw=true
