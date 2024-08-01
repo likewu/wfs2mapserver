@@ -57,27 +57,7 @@ fn SolveBA(bal_problem::&bal::BALProblem) {
               CamProjectionWithDistortion(parameters[0], parameters[1], predictions);
               residuals[0] = predictions[0] - observations[2 * i + 0];
               residuals[1] = predictions[1] - observations[2 * i + 1];
-              let b = parameters[0][0];
-              let c = parameters[1][0];
-              // Number of residuls equal to the number of observations
               assert_eq!(residuals.len(), 2);
-              for (j, (&x, &y)) in x.iter().zip(y.iter()).enumerate() {
-                  let (y_model, derivatives) = target_function(&[a, b, c], x);
-                  residuals[j] = y - y_model;
-                  // jacobians can be None, then you don't need to provide them
-                  if let Some(jacobians) = jacobians.as_mut() {
-                      // The size of the jacobians array is equal to the number of parameters,
-                      // each element is Option<&mut [&mut [f64]]>
-                      for (mut jacobian, &derivative) in jacobians.iter_mut().zip(&derivatives) {
-                          if let Some(jacobian) = &mut jacobian {
-                              // Each element in the jacobians array is slice of slices:
-                              // the first index is for different residuals components,
-                              // the second index is for different components of the parameter vector
-                              jacobian[j][0] = -derivative;
-                          }
-                      }
-                  }
-              }
               true
           },
         );
@@ -85,8 +65,8 @@ fn SolveBA(bal_problem::&bal::BALProblem) {
           .residual_block_builder()
           .set_cost(cost, 2)
           .set_lost(LossFunction::huber(1.0))
-          .add_parameter(vec![b_init])
-          .add_parameter(vec![c_init])
+          .add_parameter(camera)
+          .add_parameter(point)
           .build_into_problem()
           .unwrap()
           .0;
