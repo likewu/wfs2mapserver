@@ -1,10 +1,11 @@
 #![allow(clippy::integer_arithmetic)]
 //#![cfg(ocvrs_has_module_objdetect)]
 
+use std::env;
 use std::path::Path;
 use std::error::Error;
 
-use opencv::{highgui, core, calib3d, viz, imgcodecs, imgproc, objdetect, features2d, prelude::*, Result,
+use opencv::{highgui, core, calib3d, imgcodecs, imgproc, objdetect, features2d, prelude::*, Result,
   core::{Vector, KeyPoint, Scalar, DMatch, Point2d, Point2f, Point3d, Mat_}
 };
 
@@ -18,7 +19,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   let mut keypoints_2 = Vector::<KeyPoint>::new();
   let mut good_matches = Vector::<DMatch>::new();
   find_feature_matches(&img_1, &img_2, keypoints_1, keypoints_2, &mut good_matches);
-  println!("一共找到了{}组匹配点", matches.size());
+  println!("一共找到了{}组匹配点", good_matches.len());
 
   //-- 估计两张图像间运动
   let mut R = Mat::default();
@@ -26,7 +27,7 @@ fn main() -> Result<(), Box<dyn Error>> {
   pose_estimation_2d2d(&keypoints_1, &keypoints_2, &mut good_matches, &mut R, &mut t);
 
   //-- 验证E=t^R*scale
-  Mat t_x = Mat::<f64>::new_rows_cols_with_data(3, 3, &[
+  let t_x = Mat::<f64>::new_rows_cols_with_data(3, 3, &[
     0.0, -t.at_2d::<f64>(2,0).unwrap(), t.at_2d::<f64>(1,0).unwrap(),
     t.at_2d::<f64>(2,0).unwrap(), 0.0, -t.at_2d::<f64>(0,0).unwrap(),
     -t.at_2d::<f64>(1,0).unwrap(), t.at_2d::<f64>(0,0).unwrap(), 0.0]).unwrap();
@@ -82,12 +83,12 @@ fn find_feature_matches(img_1:&Mat, img_2:&Mat,
   //找出所有匹配之间的最小距离和最大距离, 即是最相似的和最不相似的两组点之间的距离
   for i in 0..descriptors_1.rows() {
     let dist = matches.get(i as usize).unwrap().distance;
-    if (dist < min_dist) min_dist = dist;
-    if (dist > max_dist) max_dist = dist;
+    if dist<min_dist {min_dist = dist;}
+    if dist>max_dist {max_dist = dist;}
   }
 
-  println!("-- Max dist : %f ", max_dist);
-  println!("-- Min dist : %f ", min_dist);
+  println!("-- Max dist : {} ", max_dist);
+  println!("-- Min dist : {} ", min_dist);
 
   //当描述子之间的距离大于两倍的最小距离时,即认为匹配有误.但有时候最小距离会非常小,设置一个经验值30作为下限.
   for i in 0..descriptors_1.rows() {

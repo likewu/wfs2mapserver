@@ -33,3 +33,13 @@ HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment
 
 
 https://kkgithub.com/gigahidjrikaaa/Engineering-Books/blob/main/Computer Vision/Kaehler%2C Bradski - Learning OpenCV 3 Computer Vision in C%2B%2B With the OpenCV Library.pdf?raw=true
+
+
+D:\.cargo\registry\src\mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd\ceres-solver-sys-0.3.0\build.rs
+/std:c++17
+D:\.cargo\registry\src\mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd\ceres-solver-sys-0.3.0\src\lib.cpp
+#define GLOG_NO_ABBREVIATED_SEVERITIES
+D:\.cargo\registry\src\mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd\ceres-solver-sys-0.3.0\src\lib.h
+#define GLOG_NO_ABBREVIATED_SEVERITIES
+
+D:\Programs\vcpkg\vcpkg integrate install
