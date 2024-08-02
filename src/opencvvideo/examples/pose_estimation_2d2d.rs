@@ -2,6 +2,7 @@
 //#![cfg(ocvrs_has_module_objdetect)]
 
 use std::env;
+use std::path::Path;
 use std::error::Error;
 
 use opencv::{core, calib3d, imgcodecs, features2d, prelude::*, Result,
@@ -11,8 +12,11 @@ use opencv::{core, calib3d, imgcodecs, features2d, prelude::*, Result,
 fn main() -> Result<(), Box<dyn Error>> {
   let args: Vec<String> = env::args().collect();
 
-  let img_1 = imgcodecs::imread(&args[1], imgcodecs::IMREAD_COLOR)?;
-  let img_2 = imgcodecs::imread(&args[2], imgcodecs::IMREAD_COLOR)?;
+  let img_1_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/1.png");
+  let img_2_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/2.png");
+
+  let img_1 = imgcodecs::imread(img_1_path.to_str().unwrap(), imgcodecs::IMREAD_COLOR)?;
+  let img_2 = imgcodecs::imread(img_2_path.to_str().unwrap(), imgcodecs::IMREAD_COLOR)?;
 
   let mut keypoints_1 = Vector::<KeyPoint>::new();
   let mut keypoints_2 = Vector::<KeyPoint>::new();
@@ -31,7 +35,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     *t.at_2d::<f64>(2,0).unwrap(), 0.0, -t.at_2d::<f64>(0,0).unwrap(),
     -t.at_2d::<f64>(1,0).unwrap(), *t.at_2d::<f64>(0,0).unwrap(), 0.0]).unwrap().clone_pointee();
 
-  println!("t^R={:?}", (&t_x * &R).into_result().unwrap());
+  println!("t^R={:?}\n", (&t_x * &R).into_result()?.to_mat()?.data_typed::<f64>().unwrap());
 
   //-- 验证对极约束
   let K = Mat::new_rows_cols_with_data(3, 3, &[520.9, 0., 325.1, 0., 521.0, 249.7, 0., 0., 1.]).unwrap().clone_pointee();
@@ -43,7 +47,7 @@ fn main() -> Result<(), Box<dyn Error>> {
     let y2 = Mat::new_rows_cols_with_data(3, 1, &[
       pt2.x, pt2.y, 1.]).unwrap().clone_pointee();
     let d = (y2.t().unwrap() * &t_x * &R * y1).into_result().unwrap();
-    println!("epipolar constraint = {:?}", d);
+    println!("epipolar constraint = {:?}", d.to_mat()?.data_typed::<f64>().unwrap());
   }
 
   Ok(())
@@ -86,8 +90,8 @@ fn find_feature_matches(img_1:&Mat, img_2:&Mat,
     if dist>max_dist {max_dist = dist;}
   }
 
-  println!("-- Max dist : {} ", max_dist);
-  println!("-- Min dist : {} ", min_dist);
+  println!("-- Max dist : {:?} ", max_dist);
+  println!("-- Min dist : {:?} ", min_dist);
 
   //当描述子之间的距离大于两倍的最小距离时,即认为匹配有误.但有时候最小距离会非常小,设置一个经验值30作为下限.
   for i in 0..descriptors_1.rows() {
@@ -116,10 +120,22 @@ fn pose_estimation_2d2d(
     points2.push(keypoints_2.get(good_matches.get(i).unwrap().train_idx as usize).unwrap().pt());
   }
 
+  //-- 计算基础矩阵
+  let fundamental_matrix;
+  fundamental_matrix = calib3d::find_fundamental_mat_1(&points1, &points2, calib3d::FM_8POINT, 3.0, 0.99, &mut core::no_array()).unwrap();
+  println!("fundamental_matrix is {:?}\n", fundamental_matrix.data_typed::<f64>().unwrap());
+
   //-- 计算本质矩阵
   let principal_point=Point2d::new(325.1, 249.7);        //相机主点, TUM dataset标定值
   let focal_length = 521;            //相机焦距, TUM dataset标定值
   let essential_matrix = calib3d::find_essential_mat_1(&points1, &points2, focal_length as f64, principal_point, calib3d::RANSAC, 0.999, 1.0, 1000, &mut core::no_array()).unwrap();
+  println!("essential_matrix is {:?}\n", essential_matrix.data_typed::<f64>().unwrap());
+
+  //-- 计算单应矩阵
+  //-- 但是本例中场景不是平面，单应矩阵意义不大
+  let homography_matrix;
+  homography_matrix = calib3d::find_homography(&points1, &points2, &mut core::no_array(), calib3d::RANSAC, 3.0).unwrap();
+  println!("homography_matrix is {:?}\n", homography_matrix.data_typed::<f64>().unwrap());
 
   //-- 从本质矩阵中恢复旋转和平移信息.
   let _=calib3d::recover_pose(&essential_matrix, &points1, &points2, R, t, focal_length as f64, principal_point, &mut core::no_array());
