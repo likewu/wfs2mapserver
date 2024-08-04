@@ -8,9 +8,9 @@ use std::str::{self, FromStr};
 use std::fs::{File};
 use std::io::{BufReader, BufRead};
 
-use opencv::{highgui, core, imgcodecs, objdetect, features2d, prelude::*, core::Vector, core::KeyPoint, Result};
+use opencv::{highgui, core, imgcodecs, objdetect, features2d, core::Vector, core::KeyPoint, Result};
 use nalgebra::{Matrix2, Point2, Vector2, Vector3, Isometry3, Translation3, UnitQuaternion, Quaternion};
-use ceres_solver::{CostFunctionType, NllsProblem, SolverOptions, SolverOptionsBuilder, LossFunction};
+use ceres_solver::{CostFunctionType, NllsProblem, SolverOptions, solver::SolverOptionsBuilder, LossFunction};
 
 pub mod bal;
 pub mod errfun;
@@ -18,7 +18,7 @@ pub mod errfun;
 fn main() {
   let args: Vec<String> = env::args().collect();
 
-  BALProblem bal_problem("E:\\app\\julia\\wfs2map\\src\\opencvvideo\\tests\\problem-16-22106-pre.txt");
+  let bal_problem=BALProblem::new("E:\\app\\julia\\wfs2map\\src\\opencvvideo\\tests\\problem-16-22106-pre.txt", false);
   bal_problem.Normalize();
   bal_problem.Perturb(0.1, 0.5, 0.5);
   bal_problem.WriteToPLYFile("initial.ply");
@@ -26,7 +26,7 @@ fn main() {
   bal_problem.WriteToPLYFile("final.ply");
 }
 
-fn SolveBA(bal_problem::&bal::BALProblem) {
+fn SolveBA(bal_problem:&bal::BALProblem) {
     let point_block_size = bal_problem.point_block_size();
     let camera_block_size = bal_problem.camera_block_size();
     let mut points = bal_problem.mutable_points();
@@ -42,8 +42,8 @@ fn SolveBA(bal_problem::&bal::BALProblem) {
         // Each observation corresponds to a pair of a camera and a point
         // which are identified by camera_index()[i] and point_index()[i]
         // respectively.
-        let camera = cameras[camera_block_size * bal_problem.camera_index()[i]];
-        let point = points[point_block_size * bal_problem.point_index()[i]];
+        let camera = &cameras[(camera_block_size * bal_problem.camera_index()[i as usize]) as usize..];
+        let point = &points[(point_block_size * bal_problem.point_index()[i as usize]) as usize..];
 
         let cost: CostFunctionType = Box::new(
           move |parameters: &[&[f64]],
@@ -51,12 +51,12 @@ fn SolveBA(bal_problem::&bal::BALProblem) {
                 mut jacobians: Option<&mut [Option<&mut [&mut [f64]]>]>| {
               assert_eq!(parameters.len(), 2);
               // camera[0,1,2] are the angle-axis rotation
-              let predictions=[0.0;2];
+              let mut predictions=[0.0;2];
               // Each Residual block takes a point and a camera as input
               // and outputs a 2 dimensional Residual
-              CamProjectionWithDistortion(parameters[0], parameters[1], predictions);
-              residuals[0] = predictions[0] - observations[2 * i + 0];
-              residuals[1] = predictions[1] - observations[2 * i + 1];
+              CamProjectionWithDistortion(parameters[0], parameters[1], &mut predictions);
+              residuals[0] = predictions[0] - observations[(2 * i + 0) as usize];
+              residuals[1] = predictions[1] - observations[(2 * i + 1) as usize];
               assert_eq!(residuals.len(), 2);
               true
           },
@@ -64,9 +64,9 @@ fn SolveBA(bal_problem::&bal::BALProblem) {
         problem = problem
           .residual_block_builder()
           .set_cost(cost, 2)
-          .set_lost(LossFunction::huber(1.0))
-          .add_parameter(camera)
-          .add_parameter(point)
+          .set_loss(LossFunction::huber(1.0))
+          .add_parameter(Vec::from(camera))
+          .add_parameter(Vec::from(point))
           .build_into_problem()
           .unwrap()
           .0;
@@ -79,13 +79,13 @@ fn SolveBA(bal_problem::&bal::BALProblem) {
 
     println!("Solving ceres BA ... ");
     // Solve the problem
-    let solution = problem.solve(&linear_solver_type::default()
+    let solution = problem.solve(&SolverOptionsBuilder::default()
       .linear_solver_type(ceres_solver::solver::SPARSE_SCHUR)
       .minimizer_progress_to_stdout(true).build().unwrap()).unwrap();
     println!("Brief summary: {:?}", solution.summary);
     // Getting parameter values
     let a = solution.parameters[0][0];
-    println!(solution.summary.FullReport() + "\n");
+    println!("{}\n", solution.summary.full_report());
 }
 
 // camera : 9 dims array
@@ -118,6 +118,4 @@ fn CamProjectionWithDistortion(camera:&[f64], point:&[f64], predictions:&mut [f6
     let focal = &camera[6];
     predictions[0] = focal * distortion * xp;
     predictions[1] = focal * distortion * yp;
-
-    return true;
 }
