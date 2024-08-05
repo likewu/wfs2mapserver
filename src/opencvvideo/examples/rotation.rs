@@ -3,12 +3,12 @@
 use nalgebra::{Vector2, Vector3, UnitQuaternion, Quaternion};
 
 #[inline]
-fn DotProduct(x:&[f64;3], y:&[f64;3]) -> f64 {
+fn DotProduct(x:&[f64], y:&[f64]) -> f64 {
     x[0] * y[0] + x[1] * y[1] + x[2] * y[2]
 }
 
 #[inline]
-fn CrossProduct(x:&[f64;3], y:&[f64;3], result:&mut [f64;3]) {
+fn CrossProduct(x:&[f64], y:&[f64], result:&mut [f64]) {
     result[0] = x[1] * y[2] - x[2] * y[1];
     result[1] = x[2] * y[0] - x[0] * y[2];
     result[2] = x[0] * y[1] - x[1] * y[0];
@@ -84,7 +84,7 @@ fn QuaternionToAngleAxis(quaternion:&[f64], angle_axis:&mut [f64]) {
 }
 
 #[inline]
-fn AngleAxisRotatePoint(angle_axis:&[f64;3], pt:&[f64;3], result:&mut [f64;3]) {
+pub fn AngleAxisRotatePoint(angle_axis:&[f64], pt:&[f64], result:&mut [f64]) {
     let theta2 = DotProduct(angle_axis, angle_axis);
     if theta2 > f64::EPSILON {
         // Away from zero, use the rodriguez formula
@@ -112,9 +112,9 @@ fn AngleAxisRotatePoint(angle_axis:&[f64;3], pt:&[f64;3], result:&mut [f64;3]) {
                                   w[2] * pt[0] - w[0] * pt[2],
                                   w[0] * pt[1] - w[1] * pt[0] };*/
         let mut w_cross_pt=[0.0;3];
-        CrossProduct(w, pt, w_cross_pt);
+        CrossProduct(&w, pt, &mut w_cross_pt);
 
-        let tmp = DotProduct(w, pt) * (1.0 - costheta);
+        let tmp = DotProduct(&w, pt) * (1.0 - costheta);
         //    (w[0] * pt[0] + w[1] * pt[1] + w[2] * pt[2]) * (T(1.0) - costheta);
 
         result[0] = pt[0] * costheta + w_cross_pt[0] * sintheta + w[0] * tmp;
@@ -142,7 +142,7 @@ fn AngleAxisRotatePoint(angle_axis:&[f64;3], pt:&[f64;3], result:&mut [f64;3]) {
                                   angle_axis[2] * pt[0] - angle_axis[0] * pt[2],
                                   angle_axis[0] * pt[1] - angle_axis[1] * pt[0] };*/
         let mut w_cross_pt=[0.0;3];
-        CrossProduct(angle_axis, pt, w_cross_pt);
+        CrossProduct(angle_axis, pt, &mut w_cross_pt);
 
         result[0] = pt[0] + w_cross_pt[0];
         result[1] = pt[1] + w_cross_pt[1];

@@ -12,17 +12,18 @@ use opencv::{highgui, core, imgcodecs, objdetect, features2d, core::Vector, core
 use nalgebra::{Matrix2, Point2, Vector2, Vector3, Isometry3, Translation3, UnitQuaternion, Quaternion};
 use ceres_solver::{CostFunctionType, NllsProblem, SolverOptions, solver::SolverOptionsBuilder, LossFunction};
 
-pub mod bal;
-pub mod errfun;
+mod rotation;
+//pub mod random;
+mod bal;
 
 fn main() {
   let args: Vec<String> = env::args().collect();
 
-  let bal_problem=BALProblem::new("E:\\app\\julia\\wfs2map\\src\\opencvvideo\\tests\\problem-16-22106-pre.txt", false);
+  let bal_problem=bal::BALProblem::new("E:\\app\\julia\\wfs2map\\src\\opencvvideo\\tests\\problem-16-22106-pre.txt", false);
   bal_problem.Normalize();
   bal_problem.Perturb(0.1, 0.5, 0.5);
   bal_problem.WriteToPLYFile("initial.ply");
-  SolveBA(bal_problem);
+  SolveBA(&bal_problem);
   bal_problem.WriteToPLYFile("final.ply");
 }
 
@@ -80,7 +81,7 @@ fn SolveBA(bal_problem:&bal::BALProblem) {
     println!("Solving ceres BA ... ");
     // Solve the problem
     let solution = problem.solve(&SolverOptionsBuilder::default()
-      .linear_solver_type(ceres_solver::solver::SPARSE_SCHUR)
+      .linear_solver_type(ceres_solver::solver::LinearSolverType::SPARSE_SCHUR)
       .minimizer_progress_to_stdout(true).build().unwrap()).unwrap();
     println!("Brief summary: {:?}", solution.summary);
     // Getting parameter values
