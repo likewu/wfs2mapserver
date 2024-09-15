@@ -8,23 +8,23 @@ use std::cmp::Ord;
 use nalgebra::{Vector3};
 use rand::Rng;
 
-use rotation;
+use crate::rotation;
 
 /// 从文件读入BAL dataset
-pub struct BALProblem {
+pub struct BALProblem<'a> {
     pub num_cameras_:i32,
     pub num_points_:i32,
     pub num_observations_:i32,
     pub num_parameters_:i32,
     pub use_quaternions_:bool,
 
-    pub point_index_:&mut [i32],      // 每个observation对应的point index
-    pub camera_index_:&mut [i32],     // 每个observation对应的camera index
-    pub observations_:&mut [f64],
-    pub parameters_:&mut [f64],
+    pub point_index_:&'a mut [i32],      // 每个observation对应的point index
+    pub camera_index_:&'a mut [i32],     // 每个observation对应的camera index
+    pub observations_:&'a mut [f64],
+    pub parameters_:&'a mut Vec<f64>,
 }
 
-impl BALProblem {
+impl<'a> BALProblem<'a> {
   pub fn new(filename:&str, use_quaternions:bool) -> Self {
     let input = File::open(filename).unwrap();
     let mut fptr = BufReader::new(input);
@@ -36,24 +36,24 @@ impl BALProblem {
     };*/
 
     // This wil die horribly on invalid files. Them's the breaks.
-    let mut num_cameras_ = vec![];
-    fptr.read_until(b' ', &mut num_cameras_);
-    let num_cameras_=i32::from_str(str::from_utf8(&num_cameras_).unwrap().trim()).unwrap();
-    let mut num_points_ = vec![];
-    fptr.read_until(b' ', &mut num_points_);
-    let num_points_=i32::from_str(str::from_utf8(&num_points_).unwrap().trim()).unwrap();
-    let mut num_observations_ = vec![];
-    fptr.read_until(b' ', &mut num_observations_);
-    let num_observations_=i32::from_str(str::from_utf8(&num_observations_).unwrap().trim()).unwrap();
+    let mut num_cameras_11 = vec![];
+    fptr.read_until(b' ', &mut num_cameras_11);
+    let num_cameras_:i32=i32::from_str(str::from_utf8(&num_cameras_11).unwrap().trim()).unwrap();
+    let mut num_points_11 = vec![];
+    fptr.read_until(b' ', &mut num_points_11);
+    let num_points_:i32=i32::from_str(str::from_utf8(&num_points_11).unwrap().trim()).unwrap();
+    let mut num_observations_11 = vec![];
+    fptr.read_until(b' ', &mut num_observations_11);
+    let num_observations_:i32=i32::from_str(str::from_utf8(&num_observations_11).unwrap().trim()).unwrap();
     
     println!("Header: {} {} {}", num_cameras_, num_points_, num_observations_);
 
-    let mut point_index_ = [0; num_observations_];
-    let mut camera_index_ = [0; num_observations_];
-    let mut observations_ = [0.0; 2 * num_observations_];
+    let mut point_index_ = vec![0; num_observations_ as usize];
+    let mut camera_index_ = vec![0; num_observations_ as usize];
+    let mut observations_ = vec![0.0; (2 * num_observations_) as usize];
 
     let mut num_parameters_ = 9 * num_cameras_ + 3 * num_points_;
-    let mut parameters_ = [0.0;num_parameters_];
+    let mut parameters_ = vec![0.0;num_parameters_ as usize];
 
     for i in 0..num_observations_ {
         let mut tmpdata = vec![];
@@ -82,11 +82,11 @@ impl BALProblem {
     if use_quaternions {
         // Switch the angle-axis rotations to quaternions.
         num_parameters_ = 10 * num_cameras_ + 3 * num_points_;
-        quaternion_parameters = [0.0;num_parameters_];
+        quaternion_parameters = vec![0.0;num_parameters_ as usize];
         let mut original_cursor = 0;
         let mut quaternion_cursor = 0;
         for i in 0..num_cameras_ {
-            rotation::AngleAxisToQuaternion(&parameters_[original_cursor..original_cursor+3], &quaternion_parameters[quaternion_cursor..quaternion_cursor+4]);
+            rotation::AngleAxisToQuaternion(&parameters_[original_cursor..(original_cursor+3)], &mut quaternion_parameters[quaternion_cursor..(quaternion_cursor+4)]);
             quaternion_cursor += 4;
             original_cursor += 3;
             for j in 4..10 {
@@ -109,10 +109,10 @@ impl BALProblem {
         num_observations_,
         num_parameters_,
         use_quaternions_,
-        point_index_:&mut point_index_,
-        camera_index_:&mut camera_index_,
-        observations_:&mut observations_,
-        parameters_:if use_quaternions {&mut quaternion_parameters} else {&mut parameters_},
+        point_index_:point_index_.as_mut_slice(),
+        camera_index_:camera_index_.as_mut_slice(),
+        observations_:observations_.as_mut_slice(),
+        parameters_:if use_quaternions {&mut quaternion_parameters.clone()} else {&mut parameters_.clone()},
     }
   }
 
@@ -128,9 +128,9 @@ impl BALProblem {
     fptr.write_fmt(format_args!("{} {} {} {}\n", self.num_cameras_, self.num_cameras_, self.num_points_, self.num_observations_)).unwrap();
 
     for i in 0..self.num_observations_ {
-        fptr.write_fmt(format_args!("{} {}", self.camera_index_[i], self.point_index_[i]));
+        fptr.write_fmt(format_args!("{} {}", self.camera_index_[i as usize], self.point_index_[i as usize]));
         for j in 0..2 {
-            fptr.write_fmt(format_args!(" {}", self.observations_[2 * i + j]));
+            fptr.write_fmt(format_args!(" {}", self.observations_[(2 * i + j) as usize]));
         }
         fptr.write_fmt(format_args!("\n"));
     }
@@ -139,17 +139,17 @@ impl BALProblem {
         let mut angleaxis=[0.0;9];
         if self.use_quaternions_ {
             //OutPut in angle-axis format.
-            rotation::QuaternionToAngleAxis(&self.parameters_[(10*i) as usize..(10*i+4) as usize], &angleaxis);
-            unsafe {ptr::copy(&self.parameters_[(10*i+4) as usize..(10*i+10) as usize] as *const f64, angleaxis[3..9].as_mut_ptr(), 6 * mem::size_of::<f64>());}
+            rotation::QuaternionToAngleAxis(&self.parameters_[(10*i) as usize..(10*i+4) as usize], &mut angleaxis);
+            unsafe {ptr::copy(&self.parameters_[(10*i+4) as usize] as *const f64, angleaxis[3..9].as_mut_ptr(), 6 * mem::size_of::<f64>());}
         } else {
-          unsafe {ptr::copy(&self.parameters_[(9*i) as usize..(9*i+9) as usize] as *const f64, angleaxis.as_mut_ptr(), 9 * mem::size_of::<f64>());}
+          unsafe {ptr::copy(&self.parameters_[(9*i) as usize] as *const f64, angleaxis.as_mut_ptr(), 9 * mem::size_of::<f64>());}
         }
         for j in 0..9 {
             fptr.write_fmt(format_args!("{}\n", angleaxis[j as usize]));
         }
     }
 
-    let points = self.parameters_[self.camera_block_size() * self.num_cameras_];
+    let points = self.parameters_[(self.camera_block_size() * self.num_cameras_) as usize..];
     for i in 0..self.num_points() {
         let mut point = points[(i * self.point_block_size()) as usize];
         for j in 0..self.point_block_size() {
@@ -208,7 +208,7 @@ impl BALProblem {
     // c = -R't
     let inverse_rotation = -angle_axis_ref;
     rotation::AngleAxisRotatePoint(inverse_rotation.data.as_slice(),
-                         camera[(self.camera_block_size() - 6) as usize],
+                         &camera[(self.camera_block_size() - 6) as usize..],
                          center);
     center[0] *= -1.0;
     center[1] *= -1.0;
@@ -227,7 +227,7 @@ impl BALProblem {
     }
 
     // t = -R * c
-    rotation::AngleAxisRotatePoint(angle_axis, center, camera[(self.camera_block_size() - 6) as usize..]);
+    rotation::AngleAxisRotatePoint(angle_axis, center, &mut camera[(self.camera_block_size() - 6) as usize..]);
     camera[(self.camera_block_size() - 6) as usize] *= -1.0;
     camera[(self.camera_block_size() - 5) as usize] *= -1.0;
     camera[(self.camera_block_size() - 4) as usize] *= -1.0;
@@ -235,22 +235,22 @@ impl BALProblem {
 
   pub fn Normalize(&self) {
     // Compute the marginal median of the geometry
-    let mut tmp=[0;&self.num_points_];
+    let mut tmp=vec![0;self.num_points_.try_into().unwrap()];
     let mut median=Vector3::<f64>::new(0.0,0.0,0.0);
     let points = self.mutable_points();
     for i in 0..3 {
         for j in 0..self.num_points_ {
-            tmp[j] = points[(3 * j + i) as usize] as i32;
+            tmp[j as usize] = points[(3 * j + i) as usize] as i32;
         }
-        median.get_mut(i).unwrap() = Median(tmp);
+        median[i as usize] = Median(tmp.as_mut_slice());
     }
 
     for i in 0..self.num_points_ {
         let point=Vector3::<f64>::new(points[(3*i) as usize],points[(3*i+1) as usize],points[(3*i+2) as usize]);
-        tmp[i] = (point - median).lp_norm(1) as i32;
+        tmp[i as usize] = (point - median).lp_norm(1) as i32;
     }
 
-    let median_absolute_deviation = Median(tmp);
+    let median_absolute_deviation = Median(tmp.as_mut_slice());
 
     // Scale so that the median absolute deviation of the resulting
     // reconstruction is 100
@@ -270,17 +270,17 @@ impl BALProblem {
     let mut angle_axis=[0.0;3];
     let mut center=[0.0;3];
     for i in 0..self.num_cameras_ {
-        let camera = &cameras[(self.camera_block_size() * i) as usize..];
+        let mut camera = &mut cameras[(self.camera_block_size() * i) as usize..];
         self.CameraToAngelAxisAndCenter(&camera, &mut angle_axis, &mut center);
         // center = scale * (center - median)
         center[0] = scale * (center[0] - median[0]);
         center[1] = scale * (center[1] - median[1]);
         center[2] = scale * (center[2] - median[2]);
-        self.AngleAxisAndCenterToCamera(&angle_axis, &center, &mut camera);
+        self.AngleAxisAndCenterToCamera(&angle_axis, &center, camera.as_mut_slice());
     }
   }
 
-  pub fn Perturb(&self, rotation_sigma:f64,
+  pub fn Perturb(&mut self, rotation_sigma:f64,
              translation_sigma:f64,
              point_sigma:f64) {
     assert!(point_sigma >= 0.0);
@@ -333,29 +333,29 @@ impl BALProblem {
 
   pub fn parameters(&self) -> &[f64] { self.parameters_ }
 
-  pub fn cameras(&self) -> &[f64] { self.parameters_ }
+  pub fn cameras(&self) -> &[f64] { &self.parameters_ }
 
-  pub fn points(&self) -> &[f64] { self.parameters_ + self.camera_block_size() * self.num_cameras_ }
+  pub fn points(&self) -> &[f64] { &self.parameters_[(self.camera_block_size() * self.num_cameras_) as usize..] }
 
   /// camera参数的起始地址
-  pub fn mutable_cameras(&self) -> &mut [f64] { &mut self.parameters_ }
+  pub fn mutable_cameras(&mut self) -> &mut [f64] { self.parameters_.as_mut_slice() }
 
-  pub fn mutable_points(&self) -> &mut [f64] { &mut self.parameters_[self.camera_block_size() * self.num_cameras_] }
+  pub fn mutable_points(&mut self) -> &mut [f64] { &mut self.parameters_[(self.camera_block_size() * self.num_cameras_) as usize..] }
 
-  pub fn mutable_camera_for_observation(&self, i:&i32) -> &mut [f64] {
-      self.mutable_cameras()[self.camera_index_[i] * self.camera_block_size()]
+  pub fn mutable_camera_for_observation(&mut self, i:i32) -> &mut [f64] {
+      &mut self.mutable_cameras()[(self.camera_index_[i as usize] * self.camera_block_size()) as usize..]
   }
 
-  pub fn mutable_point_for_observation(&self, i:&i32) -> &mut [f64] {
-      self.mutable_points()[self.point_index_[i] * self.point_block_size()]
+  pub fn mutable_point_for_observation(&mut self, i:i32) -> &mut [f64] {
+      &mut self.mutable_points()[(self.point_index_[i as usize] * self.point_block_size()) as usize..]
   }
 
-  pub fn camera_for_observation(&self, i:&i32) -> &[f64] {
-      self.cameras()[self.camera_index_[i] * self.camera_block_size()]
+  pub fn camera_for_observation(&self, i:i32) -> &[f64] {
+      &self.cameras()[(self.camera_index_[i as usize] * self.camera_block_size()) as usize..]
   }
 
-  pub fn point_for_observation(&self, i:&i32) -> &[f64] {
-      self.points()[self.point_index_[i] * self.point_block_size()]
+  pub fn point_for_observation(&self, i:i32) -> &[f64] {
+      &self.points()[(self.point_index_[i as usize] * self.point_block_size()) as usize..]
   }
 }
 
@@ -366,10 +366,9 @@ fn PerturbPoint3(sigma:&f64, point:&mut [f64]) {
     }
 }
 
-fn Median(mut data:Vec<i32>) -> f64 {
+fn Median(data:&mut [i32]) -> f64 {
   let n = data.len();
   let mid_point = n / 2;
-  let data=data.as_mut_slice();
   pdqselect::select(data, mid_point as usize);
   //let (lesser, median, greater) = data.select_nth_unstable_by(mid_point, |a, b| b.cmp(a));
   data[mid_point] as f64

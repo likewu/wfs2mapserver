@@ -27,11 +27,11 @@ fn main() {
   bal_problem.WriteToPLYFile("final.ply");
 }
 
-fn SolveBA(bal_problem:&bal::BALProblem) {
+fn SolveBA(bal_problem:&mut bal::BALProblem) {
     let point_block_size = bal_problem.point_block_size();
     let camera_block_size = bal_problem.camera_block_size();
-    let mut points = bal_problem.mutable_points();
-    let mut cameras = bal_problem.mutable_cameras();
+    let mut points = bal_problem.points();
+    let mut cameras = bal_problem.cameras();
 
     // Observations is 2 * num_observations long array observations
     // [u_1, u_2, ... u_n], where each u_i is two dimensional, the x

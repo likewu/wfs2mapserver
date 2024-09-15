@@ -1,7 +1,5 @@
 #![allow(clippy::integer_arithmetic)]
 
-use nalgebra::{Vector2, Vector3, UnitQuaternion, Quaternion};
-
 #[inline]
 fn DotProduct(x:&[f64], y:&[f64]) -> f64 {
     x[0] * y[0] + x[1] * y[1] + x[2] * y[2]
@@ -23,7 +21,7 @@ fn CrossProduct(x:&[f64], y:&[f64], result:&mut [f64]) {
 // The implementation may be used with auto-differentiation up to the first
 // derivative, higher derivatives may have unexpected results near the origin.
 #[inline]
-fn AngleAxisToQuaternion(angle_axis:&[f64], quaternion:&mut [f64]) {
+pub fn AngleAxisToQuaternion(angle_axis:&[f64], quaternion:&mut [f64]) {
     let a0 = &angle_axis[0];
     let a1 = &angle_axis[1];
     let a2 = &angle_axis[2];
@@ -47,7 +45,7 @@ fn AngleAxisToQuaternion(angle_axis:&[f64], quaternion:&mut [f64]) {
 }
 
 #[inline]
-fn QuaternionToAngleAxis(quaternion:&[f64], angle_axis:&mut [f64]) {
+pub fn QuaternionToAngleAxis(quaternion:&[f64], angle_axis:&mut [f64]) {
     let q1 = quaternion[1];
     let q2 = quaternion[2];
     let q3 = quaternion[3];
@@ -63,9 +61,9 @@ fn QuaternionToAngleAxis(quaternion:&[f64], angle_axis:&mut [f64]) {
         // means that angle for the angle_axis vector which is 2 * theta
         // would be greater than pi...
 
-        let two_theta = 2.0 * ((cos_theta < 0.0)
-                                      ? (-sin_theta).atan2(-cos_theta)
-                                      : sin_theta.atan2(cos_theta));
+        let two_theta = 2.0 * if cos_theta < 0.0
+                              { (-sin_theta).atan2(-cos_theta) }
+                              else { sin_theta.atan2(cos_theta) };
         let k = two_theta / sin_theta;
 
         angle_axis[0] = q1 * k;
