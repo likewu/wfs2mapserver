@@ -30,10 +30,15 @@ unsafe fn adjustThresholds(argv: &[&str], img: &Mat) {
 lazy_static! {
     static ref STRING: String = String::from("Hello, World");
     static ref ARRAY: Mutex<Vec<u8>> = Mutex::new(vec![]);
+    //static ref ARRAY11: Mutex<&mut Vec<u8>> = Mutex::new(&mut vec![]);
 }
 
 fn do_a_call() {
     ARRAY.lock().unwrap().push(1);
+}
+
+fn do_a_call22(image2222:&mut Mat) {
+    *image2222=Mat::new_rows_cols_with_data(3, 3, &[520.9, 0., 325.1, 0., 521.0, 249.7, 0., 0., 1.]).unwrap().clone_pointee();
 }
 
 fn main() -> Result<()> {
@@ -57,7 +62,19 @@ fn main() -> Result<()> {
   do_a_call();
   do_a_call();
 
-  println!("called {}", ARRAY.lock().unwrap().len());
+  println!("ARRAY.lock().unwrap() {:?}", ARRAY.lock().unwrap());
+
+  //ARRAY=Mutex::new(vec![5,6,7]);
+  //*ARRAY11.lock().unwrap()=vec![8,9,0];
+  println!("ARRAY.lock().unwrap() {:?}", ARRAY.lock().unwrap());
+
+
+  let mut image22 = Mat::default();
+  println!("image22 {:?}", image22);
+  do_a_call22(&mut image22);
+  println!("image22 {:?}", image22);
+  let u8slice : &[f64] = unsafe{ std::slice::from_raw_parts::<f64>(image22.data() as *const f64, 9) };
+  println!("image22 {:?}", u8slice);
 
   Ok(())
 }

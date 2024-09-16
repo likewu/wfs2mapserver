@@ -11,47 +11,12 @@ use opencv::{highgui, core, imgcodecs, objdetect, features2d, videoio, prelude::
 };
 
 use lazy_static::lazy_static;
-
-lazy_static! {
-// Global storage
-//
-// Float, 3-channel images
-//
-static mut image: Option<&mut Mat> = None;
-static mut IavgF: Option<&mut Mat> = None;
-static mut IdiffF: Option<&mut Mat> = None;
-static mut IprevF: Option<&mut Mat> = None;
-static mut IhiF: Option<&mut Mat> = None;
-static mut IlowF: Option<&mut Mat> = None;
-static mut tmp: Option<&mut Mat> = None;
-static mut tmp2: Option<&mut Mat> = None;
-static mut mask: Option<&mut Mat> = None;
-
-// Float, 1-channel images
-//
-static mut Igray: Option<&mut Vector<Mat>> = None;
-static mut Ilow: Option<&mut Vector<Mat>> = None;
-static mut Ihi: Option<&mut Vector<Mat>> = None;
-
-// Byte, 1-channel image
-//
-static mut Imaskt: Option<&mut Mat> = None;
-
-// Thresholds
-//
-static mut high_thresh:f32 = 20.0f32;  //scaling the thesholds in backgroundDiff()
-static mut low_thresh:f32 = 28.0f32;
-
-// Counts number of images learned for averaging later
-//
-static mut Icount:f32=0.0f32;
-}
+use std::sync::Mutex;
 
 // I is just a sample image for allocation purposes
 // (passed in for sizing)
 //
-unsafe fn AllocateImages( I:&Mat ) {
-  unsafe {
+fn AllocateImages( I:&Mat ) {
     let sz = I.size().unwrap();
     let sz=&[sz.width, sz.height];
     IavgF = Some(Box::leak(Box::new(Mat::zeros_nd(sz, core::CV_32FC3 ).unwrap().to_mat().unwrap())));
@@ -63,7 +28,6 @@ unsafe fn AllocateImages( I:&Mat ) {
     tmp = Some(Box::leak(Box::new(Mat::zeros_nd( sz, core::CV_32FC3 ).unwrap().to_mat().unwrap())));
     tmp2 = Some(Box::leak(Box::new(Mat::zeros_nd( sz, core::CV_32FC3 ).unwrap().to_mat().unwrap())));
     Imaskt = Some(Box::leak(Box::new(Mat::new_nd( sz, core::CV_32FC1 ).unwrap())));
-  }
 }
 
 // Learn the background statistics for one more frame
@@ -172,16 +136,38 @@ unsafe fn adjustThresholds(argv: Vec<String>, img: &Mat, Igray11: &mut Vector<Ma
 fn main() -> Result<()> {
   let args: Vec<String> = env::args().collect();
 
-  unsafe {
-      // 将`c`从内存中泄漏，变成`'static`生命周期
-      image = Some(Box::leak(Box::new(Mat::default())));
-      println!("{:?}", image);
-      mask = Some(Box::leak(Box::new(Mat::default())));
+  // Global storage
+  //
+  // Float, 3-channel images
+  //
+  let mut image = Mat::default();
+  let mut IavgF = Mat::default();
+  let mut IdiffF = Mat::default();
+  let mut IprevF = Mat::default();
+  let mut IhiF = Mat::default();
+  let mut IlowF = Mat::default();
+  let mut tmp = Mat::default();
+  let mut tmp2 = Mat::default();
+  let mut mask = Mat::default();
 
-      Igray = Some(Box::leak(Box::new(Vector::<Mat>::with_capacity(3))));
-      Ilow = Some(Box::leak(Box::new(Vector::<Mat>::with_capacity(3))));
-      Ihi = Some(Box::leak(Box::new(Vector::<Mat>::with_capacity(3))));
-  }
+  // Float, 1-channel images
+  //
+  let mut Igray = Vector::<Mat>::with_capacity(3);
+  let mut Ilow = Vector::<Mat>::with_capacity(3);
+  let mut Ihi = Vector::<Mat>::with_capacity(3);
+
+  // Byte, 1-channel image
+  //
+  let mut Imaskt = Mat::default();
+
+  // Thresholds
+  //
+  let mut high_thresh = 20.0f32;  //scaling the thesholds in backgroundDiff()
+  let mut low_thresh = 28.0f32;
+
+  // Counts number of images learned for averaging later
+  //
+  let mut Icount=0.0f32;
 
   let img_1_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/tree.avi");
   let mut cap = videoio::VideoCapture::from_file(img_1_path.to_str().unwrap(), videoio::CAP_ANY)?;
