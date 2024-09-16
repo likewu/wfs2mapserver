@@ -10,9 +10,6 @@ use opencv::{highgui, core, imgcodecs, objdetect, features2d, videoio, prelude::
   core::{Vector, KeyPoint, Scalar, DMatch}
 };
 
-use lazy_static::lazy_static;
-
-lazy_static! {
 // Global storage
 //
 // Float, 3-channel images
@@ -45,7 +42,6 @@ static mut low_thresh:f32 = 28.0f32;
 // Counts number of images learned for averaging later
 //
 static mut Icount:f32=0.0f32;
-}
 
 // I is just a sample image for allocation purposes
 // (passed in for sizing)

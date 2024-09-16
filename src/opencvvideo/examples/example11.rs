@@ -8,6 +8,9 @@ use opencv::{highgui, core, imgcodecs, objdetect, features2d, videoio, prelude::
   core::{Vector, KeyPoint, Scalar, DMatch}
 };
 
+use lazy_static::lazy_static;
+use std::sync::Mutex;
+
 static mut image: Option<&mut Mat> = None;
 static mut mask: Option<&mut Mat> = None;
 
@@ -24,8 +27,13 @@ unsafe fn adjustThresholds(argv: &[&str], img: &Mat) {
     //}
 }
 
-lazy_static::lazy_static! {
+lazy_static! {
     static ref STRING: String = String::from("Hello, World");
+    static ref ARRAY: Mutex<Vec<u8>> = Mutex::new(vec![]);
+}
+
+fn do_a_call() {
+    ARRAY.lock().unwrap().push(1);
 }
 
 fn main() -> Result<()> {
@@ -44,6 +52,12 @@ fn main() -> Result<()> {
   backgroundDiff(&image11.unwrap(), &mut mask11.unwrap());
 
   &STRING;
+
+  do_a_call();
+  do_a_call();
+  do_a_call();
+
+  println!("called {}", ARRAY.lock().unwrap().len());
 
   Ok(())
 }
