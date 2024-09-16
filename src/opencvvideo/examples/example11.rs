@@ -14,12 +14,18 @@ static mut mask: Option<&mut Mat> = None;
 fn backgroundDiff(
     I: &Mat,
     Imask: &mut Mat) {
+  println!("{:?}", I);
+  println!("{:?}", Imask);
 }
 
 unsafe fn adjustThresholds(argv: &[&str], img: &Mat) {
-    unsafe {
-      backgroundDiff(img, mask.unwrap());
-    }
+    //unsafe {
+    //  backgroundDiff(img, mask.unwrap());
+    //}
+}
+
+lazy_static::lazy_static! {
+    static ref STRING: String = String::from("Hello, World");
 }
 
 fn main() -> Result<()> {
@@ -28,6 +34,16 @@ fn main() -> Result<()> {
       image = Some(Box::leak(Box::new(Mat::default())));
       mask = Some(Box::leak(Box::new(Mat::default())));
   }
+
+  //backgroundDiff((&image).unwrap(), (&mask).unwrap());
+
+  let mut image11: Option<Mat> = None;
+  let mut mask11: Option<Mat> = None;
+  image11 = Some(Mat::default());
+  mask11 = Some(Mat::default());
+  backgroundDiff(&image11.unwrap(), &mut mask11.unwrap());
+
+  &STRING;
 
   Ok(())
 }

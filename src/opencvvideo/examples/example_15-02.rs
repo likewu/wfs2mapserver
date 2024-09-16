@@ -1,6 +1,8 @@
 #![allow(clippy::integer_arithmetic)]
 //#![cfg(ocvrs_has_module_objdetect)]
 
+use std::env;
+use std::process::exit;
 use std::path::Path;
 use std::ptr::{addr_of, addr_of_mut};
 
@@ -13,24 +15,24 @@ use opencv::{highgui, core, imgcodecs, objdetect, features2d, videoio, prelude::
 // Float, 3-channel images
 //
 static mut image: Option<&mut Mat> = None;
-static mut IavgF:Mat=Mat::default();
-static mut IdiffF:Mat=Mat::default();
-static mut IprevF:Mat=Mat::default();
-static mut IhiF:Mat=Mat::default();
-static mut IlowF:Mat=Mat::default();
-static mut tmp:Mat=Mat::default();
-static mut tmp2:Mat=Mat::default();
+static mut IavgF: Option<&mut Mat> = None;
+static mut IdiffF: Option<&mut Mat> = None;
+static mut IprevF: Option<&mut Mat> = None;
+static mut IhiF: Option<&mut Mat> = None;
+static mut IlowF: Option<&mut Mat> = None;
+static mut tmp: Option<&mut Mat> = None;
+static mut tmp2: Option<&mut Mat> = None;
 static mut mask: Option<&mut Mat> = None;
 
 // Float, 1-channel images
 //
-static mut Igray:Vector<Mat>=Vector::<Mat>::with_capacity(3);
-static mut Ilow:Vector<Mat>=Vector::<Mat>::with_capacity(3);
-static mut Ihi:Vector<Mat>=Vector::<Mat>::with_capacity(3);
+static mut Igray: Option<&mut Vector<Mat>> = None;
+static mut Ilow: Option<&mut Vector<Mat>> = None;
+static mut Ihi: Option<&mut Vector<Mat>> = None;
 
 // Byte, 1-channel image
 //
-static Imaskt: Option<&mut Mat> = None;
+static mut Imaskt: Option<&mut Mat> = None;
 
 // Thresholds
 //
@@ -44,18 +46,19 @@ static mut Icount:f32=0.0f32;
 // I is just a sample image for allocation purposes
 // (passed in for sizing)
 //
-fn AllocateImages( I:&Mat ) {
+unsafe fn AllocateImages( I:&Mat ) {
   unsafe {
     let sz = I.size().unwrap();
-    IavgF = Mat::zeros(sz, core::CV_32FC3 );
-    IdiffF = Mat::zeros(sz, core::CV_32FC3 );
-    IprevF = Mat::zeros(sz, core::CV_32FC3 );
-    IhiF = Mat::zeros(sz, core::CV_32FC3 );
-    IlowF = Mat::zeros(sz, core::CV_32FC3 );
+    let sz=&[sz.width, sz.height];
+    IavgF = Some(Box::leak(Box::new(Mat::zeros_nd(sz, core::CV_32FC3 ).unwrap().to_mat().unwrap())));
+    IdiffF = Some(Box::leak(Box::new(Mat::zeros_nd(sz, core::CV_32FC3 ).unwrap().to_mat().unwrap())));
+    IprevF = Some(Box::leak(Box::new(Mat::zeros_nd(sz, core::CV_32FC3 ).unwrap().to_mat().unwrap())));
+    IhiF = Some(Box::leak(Box::new(Mat::zeros_nd(sz, core::CV_32FC3 ).unwrap().to_mat().unwrap())));
+    IlowF = Some(Box::leak(Box::new(Mat::zeros_nd(sz, core::CV_32FC3 ).unwrap().to_mat().unwrap())));
     Icount = 0.00001; // Protect against divide by zero
-    tmp = Mat::zeros( sz, core::CV_32FC3 );
-    tmp2 = Mat::zeros( sz, core::CV_32FC3 );
-    Imaskt = Some(Box::leak(Box::new(Mat::new( sz, core::CV_32FC1 ))));
+    tmp = Some(Box::leak(Box::new(Mat::zeros_nd( sz, core::CV_32FC3 ).unwrap().to_mat().unwrap())));
+    tmp2 = Some(Box::leak(Box::new(Mat::zeros_nd( sz, core::CV_32FC3 ).unwrap().to_mat().unwrap())));
+    Imaskt = Some(Box::leak(Box::new(Mat::new_nd( sz, core::CV_32FC1 ).unwrap())));
   }
 }
 
@@ -63,8 +66,8 @@ fn AllocateImages( I:&Mat ) {
 // I is a color sample of the background, 3-channel, 8u
 //
 fn accumulateBackground( I:&Mat ){
-  static first = 1; // nb. Not thread safe
-  I.convertTo( tmp, core::CV_32F ); // convert to float
+  static mut first:i32 = 1; // nb. Not thread safe
+  /*I.convert_to_def( tmp.unwrap(), core::CV_32F ); // convert to float
   if( !first ){
     IavgF += tmp;
     core::absdiff( tmp, IprevF, tmp2 );
@@ -72,28 +75,32 @@ fn accumulateBackground( I:&Mat ){
     Icount += 1.0;
   }
   first = 0;
-  IprevF = tmp;
+  IprevF = tmp;*/
 }
 
-fn setHighThreshold( scale:f32 ) {
-  IhiF = IavgF + (IdiffF * scale);
-  core::split( IhiF, Ihi );
+fn setHighThreshold( scale:f32,
+    Ilow11: &mut Vector<Mat>,
+    Ihi11: &mut Vector<Mat> ) {
+  /*IhiF = IavgF + (IdiffF * scale);
+  core::split( IhiF11, Ihi11 );*/
 }
 
-fn setLowThreshold( scale:f32 ) {
-  IlowF = IavgF - (IdiffF * scale);
-  core::split( IlowF, Ilow );
+fn setLowThreshold( scale:f32,
+    Ilow11: &mut Vector<Mat>,
+    Ihi11: &mut Vector<Mat> ) {
+  /*IlowF = IavgF - (IdiffF * scale);
+  core::split( IlowF11, Ilow11 );*/
 }
 
 fn createModelsfromStats() {
-  IavgF *= (1.0/Icount);
+  /*IavgF *= (1.0/Icount);
   IdiffF *= (1.0/Icount);
   
   // Make sure diff is always something
   //
   IdiffF += core::Scalar::new( 1.0, 1.0, 1.0 );
-  setHighThreshold(high_thresh.clone());
-  setLowThreshold(low_thresh.clone());
+  setHighThreshold(high_thresh.clone(), Ilow.unwrap(), Ihi.unwrap());
+  setLowThreshold(low_thresh.clone(), Ilow.unwrap(), Ihi.unwrap());*/
 }
 
 // Create a binary: 0,255 mask where 255 (red) means foreground pixel
@@ -102,40 +109,43 @@ fn createModelsfromStats() {
 //
 fn backgroundDiff(
     I: &Mat,
-    Imask: &mut Mat) {
+    Imask: &mut Mat,
+    Ilow11: &mut Vector<Mat>,
+    Ihi11: &mut Vector<Mat>) {
   
-  I.convert_to_def( tmp, core::CV_32F ); // To float
-  core::split( tmp, Igray );
+  /*I.convert_to_def( tmp.unwrap(), core::CV_32F ); // To float
+  core::split( tmp.unwrap(), Igray.unwrap() );
   
   // Channel 1
   //
-  core::in_range( Igray[0], Ilow[0], Ihi[0], Imask.unwrap() );
+  core::in_range( &Igray.unwrap().get(0).unwrap(), &Ilow11.get(0).unwrap(), &Ihi11.get(0).unwrap(), Imask );
 
   // Channel 2
   //
-  core::in_range( Igray[1], Ilow[1], Ihi[1], Imaskt.unwrap() );
-  //Imask = core::min( Imask, Imaskt );
+  core::in_range( &Igray.unwrap().get(1).unwrap(), &Ilow11.get(1).unwrap(), &Ihi11.get(1).unwrap(), Imaskt.unwrap() );
+  core::min( Imask, Imaskt.unwrap(), Imask );
 
   // Channel 3
   //
-  core::in_range( Igray[2], Ilow[2], Ihi[2], Imaskt.unwrap() );
-  //Imask = core::min( Imask, Imaskt );
-
+  core::in_range( &Igray.unwrap().get(2).unwrap(), &Ilow11.get(2).unwrap(), &Ihi11.get(2).unwrap(), Imaskt.unwrap() );
+  core::min( Imask, Imaskt.unwrap(), Imask );
+*/
   // Finally, invert the results
   //
-  //Imask.copy((Imask - 255) * -1);
+  *Imask=((&*Imask - Scalar::from(255)).into_result().unwrap().to_mat().unwrap() * -1.0).into_result().unwrap().to_mat().unwrap();
 }
 
-fn showForgroundInRed( argv: &[&str], img: &Mat) {
-    let rawImage=Mat::default();
-    core::split( img, Igray );
-    Igray[2] = core::max( mask.unwrap(), Igray[2] );
-    core::merge( Igray, &mut rawImage );
+fn showForgroundInRed( argv: Vec<String>, img: &Mat, Igray11: &mut Vector<Mat>, mask11: &Mat) {
+    let mut rawImage=Mat::default();
+    core::split( img, Igray11 );
+    core::max( mask11, &Igray11.get(2).unwrap(), &mut Igray11.get(2).unwrap());
+    core::merge( Igray11, &mut rawImage );
     highgui::imshow( "aaa", &rawImage );
-    highgui::imshow("Segmentation", mask.unwrap());
+    highgui::imshow("Segmentation", mask11);
 }
 
-fn adjustThresholds(argv: &[&str], img: &Mat) {
+unsafe fn adjustThresholds(argv: Vec<String>, img: &Mat, Igray11: &mut Vector<Mat>, mask11: &mut Mat
+  , Ilow11: &mut Vector<Mat>, Ihi11: &mut Vector<Mat>) {
   let key = highgui::wait_key(0).unwrap() as u8;
   while key != 27 && key != b'Q' && key != b'q'  // Esc or Q or q to exit
   {
@@ -147,21 +157,26 @@ fn adjustThresholds(argv: &[&str], img: &Mat) {
     }
     unsafe {
       println!("H or h, L or l, esq or q to quit;  high_thresh = {}, low_thresh = {}", high_thresh, low_thresh);
-      setHighThreshold(high_thresh.clone());
-      setLowThreshold(low_thresh.clone());
-      backgroundDiff(img, mask.unwrap());
+      setHighThreshold(high_thresh.clone(), Ilow11, Ihi11);
+      setLowThreshold(low_thresh.clone(), Ilow11, Ihi11);
+      backgroundDiff(img, mask11, Ilow11, Ihi11);
     }
-    showForgroundInRed(argv, img);
+    showForgroundInRed(argv.clone(), img, Igray11, mask11);
   }
 }
 
 fn main() -> Result<()> {
+  let args: Vec<String> = env::args().collect();
+
   unsafe {
       // 将`c`从内存中泄漏，变成`'static`生命周期
       image = Some(Box::leak(Box::new(Mat::default())));
       println!("{:?}", image);
       mask = Some(Box::leak(Box::new(Mat::default())));
-      Imaskt = Some(Box::leak(Box::new(Mat::default())));
+
+      Igray = Some(Box::leak(Box::new(Vector::<Mat>::with_capacity(3))));
+      Ilow = Some(Box::leak(Box::new(Vector::<Mat>::with_capacity(3))));
+      Ihi = Some(Box::leak(Box::new(Vector::<Mat>::with_capacity(3))));
   }
 
   let img_1_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/tree.avi");
@@ -209,7 +224,7 @@ fn main() -> Result<()> {
     println!("{}", frame_count);
     frame_count+=1;
     unsafe {
-      backgroundDiff( image.unwrap(), mask.unwrap() );
+      backgroundDiff( image.unwrap(), mask.unwrap(), Ilow.unwrap(), Ihi.unwrap() );
     }
     unsafe {
       highgui::imshow("Segmentation", mask.unwrap());
@@ -218,13 +233,14 @@ fn main() -> Result<()> {
     // A simple visualization is to write to the red channel
     //
     unsafe {
-      showForgroundInRed( argv, image.unwrap());
+      showForgroundInRed( args, image.unwrap(), Igray.unwrap(), mask.unwrap());
     }
     if key == b'a' {
       println!("In adjust thresholds, 'H' or 'h' == high thresh up or down; 'L' or 'l' for low thresh up or down.");
       println!(" esq, 'q' or 'Q' to quit ");
       unsafe {
-        adjustThresholds(argv, image.unwrap());
+        adjustThresholds(args, image.unwrap(), Igray.unwrap(), mask.unwrap()
+          , Ilow.unwrap(), Ihi.unwrap());
       }
       println!("Done with adjustThreshold, back to frame stepping, esq, q or Q to quit.");
     }
