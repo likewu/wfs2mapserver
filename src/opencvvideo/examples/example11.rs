@@ -11,6 +11,32 @@ use opencv::{highgui, core, imgcodecs, objdetect, features2d, videoio, prelude::
 use lazy_static::lazy_static;
 use std::sync::Mutex;
 
+#[cfg(not(target_env = "msvc"))]
+use jemallocator;
+#[cfg(not(target_env = "msvc"))]
+use jemalloc_ctl::{AsName, Access};
+use std::collections::HashMap;
+
+#[cfg(not(target_env = "msvc"))]
+#[global_allocator]
+static ALLOC: jemallocator::Jemalloc = jemallocator::Jemalloc;
+
+const PROF_ACTIVE: &'static [u8] = b"prof.active\0";
+const PROF_DUMP: &'static [u8] = b"prof.dump\0";
+const PROFILE_OUTPUT: &'static [u8] = b"profile.out\0";
+
+#[cfg(not(target_env = "msvc"))]
+fn set_prof_active(active: bool) {
+    let name = PROF_ACTIVE.name();
+    name.write(active).expect("Should succeed to set prof");
+}
+
+#[cfg(not(target_env = "msvc"))]
+fn dump_profile() {
+    let name = PROF_DUMP.name();
+    name.write(PROFILE_OUTPUT).expect("Should succeed to dump profile")
+}
+
 static mut image: Option<&mut Mat> = None;
 static mut mask: Option<&mut Mat> = None;
 
@@ -42,6 +68,21 @@ fn do_a_call22(image2222:&mut Mat) {
 }
 
 fn main() -> Result<()> {
+  #[cfg(not(target_env = "msvc"))]
+  set_prof_active(true);
+
+  #[cfg(not(target_env = "msvc"))]
+  let mut buffers: Vec<HashMap<i32, i32>> = Vec::new();
+  #[cfg(not(target_env = "msvc"))]
+  for _ in 0..100 {
+      buffers.push(HashMap::with_capacity(1024));
+  }
+
+  #[cfg(not(target_env = "msvc"))]
+  set_prof_active(false);
+  #[cfg(not(target_env = "msvc"))]
+  dump_profile();
+
   unsafe {
       // 将`c`从内存中泄漏，变成`'static`生命周期
       image = Some(Box::leak(Box::new(Mat::default())));

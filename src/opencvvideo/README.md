@@ -43,3 +43,14 @@ D:\.cargo\registry\src\mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd\ceres-solve
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 
 D:\Programs\vcpkg\vcpkg integrate install
+
+
+https://github.com/GreptimeTeam/greptimedb/blob/develop/src/common/mem-prof/README.md
+https://github.com/tikv/jemallocator
+MALLOC_CONF=prof:true,lg_prof_interval:28
+jeprof --svg <path_to_greptimedb_binary> --base=<baseline_prof> <profile_data> > output.svg
+jeprof --show_bytes --pdf <path_to_binary> ./profile.out > ./profile.pdf
+
+
+https://github.com/tokio-rs/console
+tokio-console

@@ -16,6 +16,8 @@ blas = ["ndarray-linalg", "linfa/ndarray-linalg"]
 serde = ["serde_crate", "ndarray/serde", "serde_regex"]
 
 [dependencies]
+lazy_static = "1.5.0"
+
 opencv = "0.92.0"
 
 linfa = { version = "0.7.0" }
@@ -38,6 +40,17 @@ ceres-solver = { version = "0.3.0", features = ["source"] }
 
 rand = "0.8.5"
 pdqselect = "0.1.1"
+
+[target.'cfg(not(target_env = "msvc"))'.dependencies]
+jemallocator = "0.5.4"
+jemalloc-ctl = "0.5.4"
+
+[target.'cfg(not(target_env = "msvc"))'.dependencies.jemalloc-sys]
+version = "0.5.4"
+features = ["stats", "profiling", "unprefixed_malloc_on_supported_platforms"]
+
+[profile.release]
+debug = true
 
 [dependencies.serde_crate]
 package = "serde"

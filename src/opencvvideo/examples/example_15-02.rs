@@ -183,14 +183,14 @@ fn main() -> Result<()> {
   while true {
     println!("frame#: {}", frame_count);
     unsafe {
-      cap.read(image.unwrap())?;
+      cap.read(&mut image)?;
     }
-    if image.unwrap().size()?.width == 0 { exit(1); } // Something went wrong, abort
-    if frame_count == 0 { AllocateImages(image.unwrap());}
+    if image.size()?.width == 0 { exit(1); } // Something went wrong, abort
+    if frame_count == 0 { AllocateImages(&image); }
     unsafe {
-      accumulateBackground( image.unwrap() );
+      accumulateBackground( &image );
     }
-    highgui::imshow( "aaa", image.unwrap() );
+    highgui::imshow( "aaa", &image );
     frame_count+=1;
     key = highgui::wait_key(7).unwrap() as u8;
     if key == 27 || key == b'q' || key == b'Q' || frame_count >= number_to_train_on {break;} //Allow early exit on space, esc, q
@@ -208,30 +208,22 @@ fn main() -> Result<()> {
   key = highgui::wait_key(0).unwrap() as u8;
   while key != 27 || key == b'q' || key == b'Q' { // esc, 'q' or 'Q' to exit
     unsafe {
-      cap.read(image.unwrap())?;
+      cap.read(&image)?;
     }
-    if image.unwrap().size()?.width == 0 {exit(0);}
+    if image.size()?.width == 0 {exit(0);}
     println!("{}", frame_count);
     frame_count+=1;
-    unsafe {
-      backgroundDiff( image.unwrap(), mask.unwrap(), Ilow.unwrap(), Ihi.unwrap() );
-    }
-    unsafe {
-      highgui::imshow("Segmentation", mask.unwrap());
-    }
-
+    backgroundDiff( &image, &mask, &Ilow, &Ihi );
+    highgui::imshow("Segmentation", &mask;
+    
     // A simple visualization is to write to the red channel
     //
-    unsafe {
-      showForgroundInRed( args, image.unwrap(), Igray.unwrap(), mask.unwrap());
-    }
+    showForgroundInRed( args, &image, &Igray, &mask );
     if key == b'a' {
       println!("In adjust thresholds, 'H' or 'h' == high thresh up or down; 'L' or 'l' for low thresh up or down.");
       println!(" esq, 'q' or 'Q' to quit ");
-      unsafe {
-        adjustThresholds(args, image.unwrap(), Igray.unwrap(), mask.unwrap()
-          , Ilow.unwrap(), Ihi.unwrap());
-      }
+      adjustThresholds(args, image, Igray, mask
+          , Ilow, Ihi);
       println!("Done with adjustThreshold, back to frame stepping, esq, q or Q to quit.");
     }
   }
