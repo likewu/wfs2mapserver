@@ -62,8 +62,8 @@ fn main() -> Result<()> {
                       .duration_since(UNIX_EPOCH)
                       .unwrap()
                       .as_secs();
-    println!("found:{} timestamp:{} last_captured_timestamp:{}", found, timestamp, last_captured_timestamp);
-    if found && timestamp - last_captured_timestamp > 1 {
+    println!("found:{} timestamp:{} last_captured_timestamp:{} image_points.len():{}", found, timestamp, last_captured_timestamp, image_points.len());
+    if found && timestamp-last_captured_timestamp > 1 {
         last_captured_timestamp = timestamp;
         image = core::xor_mat_scalar(&image, core::Scalar::all(255.)).unwrap().to_mat()?;
         let mut mcorners=Mat::from_exact_iter(corners.clone().into_iter())?;
@@ -78,11 +78,16 @@ fn main() -> Result<()> {
         //object_points.remove(object_points.len())?;
 
         //opts.resize(board_n);
+        //println!("{:?}", opts);
         for j in 0..board_n {
-            opts.set(j as usize, Point3f::new((j / board_w) as f32,
+            opts.push(Point3f::new((j / board_w) as f32,
                                   (j % board_w) as f32, 0.0f32));
         }
+        //println!("{:?}", opts);
+        object_points.set(object_points.len()-1, opts.clone());
         println!("Collected our {} of {} needed chessboard images\n", image_points.len(), n_boards);
+        //println!("{:?}", image_points);
+        println!("{:?}", object_points);
     }
     highgui::imshow("Calibration", &image);
 
@@ -109,7 +114,7 @@ fn main() -> Result<()> {
       core::TermCriteria::new(core::TermCriteria_COUNT+core::TermCriteria_EPS, 30, f64::EPSILON*2.).unwrap());
 
   // SAVE THE INTRINSICS AND DISTORTIONS
-  println!(" *** DONE!\n\nReprojection error is {:?}\nStoring Intrinsics.xml and Distortions.xml files\n\n", err);
+  println!("*** DONE!\n\nReprojection error is {:?}\n\n", err);
 
   let intrinsic_matrix_loaded=intrinsic_matrix;
   let distortion_coeffs_loaded=distortion_coeffs;
