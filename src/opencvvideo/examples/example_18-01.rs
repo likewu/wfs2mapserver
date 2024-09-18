@@ -4,6 +4,7 @@
 use std::env;
 use std::process::exit;
 use std::path::Path;
+use std::slice::from_raw_parts;
 
 use opencv::{highgui, core, imgcodecs, objdetect, features2d, videoio, calib3d, imgproc, prelude::*, Result,
   core::{Vector, KeyPoint, Scalar, DMatch, Point2f, Point3f}
@@ -22,6 +23,7 @@ fn main() -> Result<()> {
 
   let board_n = board_w * board_h;
   let board_sz = core::Size{width:board_w, height:board_h};
+  //https://kkgithub.com/smidm/video2calibration
   let img_1_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/chessboard.avi");
   let mut capture = videoio::VideoCapture::from_file(img_1_path.to_str().unwrap(), videoio::CAP_ANY)?;
   //let mut capture = videoio::VideoCapture::new(0, videoio::CAP_ANY)?; // 0 is the default camera
@@ -74,7 +76,7 @@ fn main() -> Result<()> {
         // scale the corner coordinates
         image_points.push(corners);
         object_points.push(Vector::<Point3f>::with_capacity(board_n as usize));
-        let opts = &mut object_points.get(object_points.len()-1)?;
+        let mut opts = object_points.get(object_points.len()-1)?;
         //object_points.remove(object_points.len())?;
 
         //opts.resize(board_n);
@@ -84,10 +86,10 @@ fn main() -> Result<()> {
                                   (j % board_w) as f32, 0.0f32));
         }
         //println!("{:?}", opts);
-        object_points.set(object_points.len()-1, opts.clone());
+        object_points.set(object_points.len()-1, opts);
         println!("Collected our {} of {} needed chessboard images\n", image_points.len(), n_boards);
         //println!("{:?}", image_points);
-        println!("{:?}", object_points);
+        //println!("{:?}", object_points);
     }
     highgui::imshow("Calibration", &image);
 
@@ -115,6 +117,11 @@ fn main() -> Result<()> {
 
   // SAVE THE INTRINSICS AND DISTORTIONS
   println!("*** DONE!\n\nReprojection error is {:?}\n\n", err);
+  if let Ok(rms)=err {
+    println!("intrinsic_matrix:{:?}\n", unsafe{ from_raw_parts::<f64>(intrinsic_matrix.data() as *const f64, 9) });
+    println!("distortion_coeffs:{:?}\n", unsafe{ from_raw_parts::<f64>(distortion_coeffs.data() as *const f64, 5) });
+    println!("RMS:{}", rms)
+  }
 
   let intrinsic_matrix_loaded=intrinsic_matrix;
   let distortion_coeffs_loaded=distortion_coeffs;
