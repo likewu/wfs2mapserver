@@ -104,9 +104,9 @@ fn find_feature_matches(img_1:&Mat, img_2:&Mat,
 }
 
 fn pose_estimation_2d2d(
-  keypoints_1:&Vector::<KeyPoint>,
-  keypoints_2:&Vector::<KeyPoint>,
-  good_matches:&mut Vector::<DMatch>,
+  keypoints_1:&Vector<KeyPoint>,
+  keypoints_2:&Vector<KeyPoint>,
+  good_matches:&mut Vector<DMatch>,
   R:&mut Mat, t:&mut Mat) {
   // 相机内参,TUM Freiburg2
   let _K = Mat::new_rows_cols_with_data(3, 3, &[520.9, 0., 325.1, 0., 521.0, 249.7, 0., 0., 1.]).unwrap().clone_pointee();
