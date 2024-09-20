@@ -25,7 +25,7 @@ fn main() -> Result<()> {
   // Compute the histogram
   println!("src matrix dims: {:?} channels: {:?} depth: {:?}", src.dims(), src.channels(), src.depth());
   println!("hsv matrix dims: {:?} channels: {:?} depth: {:?}", hsv.dims(), hsv.channels(), hsv.depth());
-  imgproc::calc_hist(&hsv, &ch, &core::no_array(), &mut hist, &histSize, &ranges, true);
+  imgproc::calc_hist(&hsv, &ch, &core::no_array(), &mut hist, &histSize, &ranges, false);
   println!("hist matrix dims: {:?} channels: {:?} depth: {:?}", hist.dims(), hist.channels(), hist.depth());
   core::normalize(&hist.clone(), &mut hist, 0., 255., core::NORM_MINMAX, -1, &core::no_array());
   println!("hist matrix dims: {:?} channels: {:?} depth: {:?}", hist.dims(), hist.channels(), hist.depth());

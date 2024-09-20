@@ -29,7 +29,9 @@ int main( int argc, char** argv ){
 
   // Compute the histogram
   //
+  cout << "\nhsv matrix dims: " << hsv.dims << " channels: " << hsv.channels() << " depth: " << hsv.depth() << endl;
   cv::calcHist(&hsv, 1, ch, cv::noArray(), hist, 2, histSize, ranges, true);
+  cout << "\nhist matrix dims: " << hist.dims << " channels: " << hist.channels() <<  " depth: " << hist.depth() << endl;
   cv::normalize(hist, hist, 0, 255, cv::NORM_MINMAX);
 
   int scale = 10;
