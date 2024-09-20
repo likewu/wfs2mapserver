@@ -1,10 +1,16 @@
 // Example 15-2. Learning a background model to identify foreground pixels
-#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>
+#include <opencv2/imgproc.hpp>
 #include <iostream>
 #include <cstdlib>
 #include <fstream>
 
 using namespace std;
+
+using namespace cv;
+using std::cout; using std::cerr; using std::endl;
 
 // Global storage
 //
@@ -133,8 +139,8 @@ void showForgroundInRed( char** argv, const cv::Mat &img) {
 		cv::split( img, Igray );
 		Igray[2] = cv::max( mask, Igray[2] );
 		cv::merge( Igray, rawImage );
-		cv::imshow( argv[0], rawImage );
-		cv::imshow("Segmentation", mask);
+		imshow( argv[0], rawImage );
+		imshow("Segmentation", mask);
 }
 
 void adjustThresholds(char** argv, cv::Mat &img) {
@@ -155,8 +161,8 @@ void adjustThresholds(char** argv, cv::Mat &img) {
 
 ////////////////////////////////////////////////////////////////
 int main( int argc, char** argv) {
-	cv::namedWindow( argv[0], cv::WINDOW_AUTOSIZE );
-	cv::VideoCapture cap;
+	namedWindow( argv[0], cv::WINDOW_AUTOSIZE );
+	VideoCapture cap;
 	if((argc < 3)|| !cap.open(argv[2])) {
 		cerr << "Couldn't run the program" << endl;
 		help(argv);
@@ -177,7 +183,7 @@ int main( int argc, char** argv) {
 		if( !image.data ) exit(1); // Something went wrong, abort
 		if(frame_count == 0) { AllocateImages(image);}
 		accumulateBackground( image );
-		cv::imshow( argv[0], image );
+		imshow( argv[0], image );
 		frame_count++;
 		if( (key = cv::waitKey(7)) == 27 || key == 'q' || key == 'Q' || frame_count >= number_to_train_on) break; //Allow early exit on space, esc, q
 	}
@@ -196,7 +202,7 @@ int main( int argc, char** argv) {
 		if( !image.data ) exit(0);
 		cout <<  frame_count++ << endl;
 		backgroundDiff( image, mask );
-		cv::imshow("Segmentation", mask);
+		imshow("Segmentation", mask);
 
 		// A simple visualization is to write to the red channel
 		//

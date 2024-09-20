@@ -10,6 +10,7 @@ project("example"
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS OFF)
+#add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 
 #
 # Enable modules in CMake
@@ -41,7 +42,9 @@ endif()
 
 add_compile_definitions(-D_LIBCPP_REMOVE_TRANSITIVE_INCLUDES)
 add_compile_options(-fdiagnostics-color -pedantic-errors -Wall -Wextra -Wdeprecated
-  -fexperimental-library -stdlib=libc++ -cxx-isystem ${LIBCXX_BUILD}/include/c++/v1)
+  -fexperimental-library -stdlib=libc++
+  #-cxx-isystem ${LIBCXX_BUILD}/include/c++/v1
+  )
 add_link_options(-fuse-ld=lld -stdlib=libc++ -Wl,--color-diagnostics -fdiagnostics-color
   -fexperimental-library)
 
@@ -79,9 +82,14 @@ endif()
 #  PUBLIC
 #    FILE_SET CXX_MODULES FILES coro.cppm)
 
+message(STATUS "OpenCV_CUDA: ${OpenCV_CUDA}")
+
 #
 # Add the project
 #
+add_executable( example_13-01 src/example_13-01.cpp )
+target_link_libraries( example_13-01 ${OpenCV_LIBS} )
+
 add_executable( example_15-02 src/example_15-02.cpp )
 #add_dependencies(main std.compat)
 #target_link_libraries(main std.compat)
