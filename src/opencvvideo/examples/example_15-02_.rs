@@ -156,7 +156,7 @@ unsafe fn adjustThresholds(argv: Vec<String>, img: &Mat, Igray11: &mut Vector<Ma
       if key == b'h' { high_thresh -= 0.2;}
     }
     unsafe {
-      println!("H or h, L or l, esq or q to quit;  high_thresh = {}, low_thresh = {}", high_thresh, low_thresh);
+      println!("H or h, L or l, esc or q to quit;  high_thresh = {}, low_thresh = {}", high_thresh, low_thresh);
       setHighThreshold(high_thresh.clone(), Ilow11, Ihi11);
       setLowThreshold(low_thresh.clone(), Ilow11, Ihi11);
       backgroundDiff(img, mask11, Ilow11, Ihi11);
@@ -210,7 +210,7 @@ fn main() -> Result<()> {
   //
   println!("Creating the background model");
   createModelsfromStats();
-  println!("Done!  Hit any key to continue into single step. Hit 'a' or 'A' to adjust thresholds, esq, 'q' or 'Q' to quit\n");
+  println!("Done!  Hit any key to continue into single step. Hit 'a' or 'A' to adjust thresholds, esc, 'q' or 'Q' to quit\n");
   
   // SECOND PROCESSING LOOP (TESTING):
   //
@@ -237,12 +237,12 @@ fn main() -> Result<()> {
     }
     if key == b'a' {
       println!("In adjust thresholds, 'H' or 'h' == high thresh up or down; 'L' or 'l' for low thresh up or down.");
-      println!(" esq, 'q' or 'Q' to quit ");
+      println!(" esc, 'q' or 'Q' to quit ");
       unsafe {
         adjustThresholds(args, image.unwrap(), Igray.unwrap(), mask.unwrap()
           , Ilow.unwrap(), Ihi.unwrap());
       }
-      println!("Done with adjustThreshold, back to frame stepping, esq, q or Q to quit.");
+      println!("Done with adjustThreshold, back to frame stepping, esc, q or Q to quit.");
     }
   }
 
