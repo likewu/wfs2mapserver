@@ -23,28 +23,28 @@ fn main() -> Result<()> {
   let args: Vec<String> = env::args().collect();
 
   let mut img=unsafe {Mat::new_rows_cols(500, 500, core::CV_8UC3).unwrap()};
-  let mut kalman=video::KalmanFilter::new(2, 1, 0, core::CV_32F)?;
+  let mut kalman=video::KalmanFilter::new(2, 1, 0, core::CV_64F)?;
 
   // state is (phi, delta_phi) - angle and angular velocity
   // Initialize with random guess.
   //
-  let mut x_k= unsafe {Mat::new_rows_cols(2, 1, core::CV_32F).unwrap()};
+  let mut x_k= unsafe {Mat::new_rows_cols(2, 1, core::CV_64F).unwrap()};
   core::randn(&mut x_k, &0.0, &0.1);
 
   // process noise
   //
-  let mut w_k= unsafe {Mat::new_rows_cols(2, 1, core::CV_32F).unwrap()};
+  let mut w_k= unsafe {Mat::new_rows_cols(2, 1, core::CV_64F).unwrap()};
 
   // measurements, only one parameter for angle
   //
-  let mut z_k = Mat::zeros(1, 1, core::CV_32F)?.to_mat()?;
+  let mut z_k = Mat::zeros(1, 1, core::CV_64F)?.to_mat()?;
 
   // Transition matrix 'F' describes relationship between
   // model parameters at step k and at step k+1 (this is
   // the "dynamics" in our model.
   //
   let F:[f64;4] = [1., 1., 0., 1.];
-  kalman.set_transition_matrix(Mat::new_rows_cols_with_default(2, 2, core::CV_32F, Scalar::from_array(F))?.clone());
+  kalman.set_transition_matrix(Mat::new_rows_cols_with_default(2, 2, core::CV_64F, Scalar::from_array(F))?.clone());
 
   // Initialize other Kalman filter parameters.
   //
@@ -72,9 +72,9 @@ fn main() -> Result<()> {
       //
       img.set_scalar(Scalar::all(0.));
       let img11=&img.clone();
-      imgproc::circle(&mut img, phi2xy!(z_k,&img11), 4, Scalar::from((128, 255, 255)), 3, imgproc::LINE_8, 0);  // observed
-      imgproc::circle(&mut img, phi2xy!(y_k,&img11), 4, Scalar::from((255, 255, 255)), 2, imgproc::LINE_8, 0);  // predicted
-      imgproc::circle(&mut img, phi2xy!(x_k,&img11), 4, Scalar::from((0, 0, 255)), 3, imgproc::LINE_8, 0);  // actual to
+      imgproc::circle(&mut img, phi2xy!(z_k,&img11), 4, Scalar::from((128, 255, 255)), 3, imgproc::LINE_8, 0);  // observed (in yellow)
+      imgproc::circle(&mut img, phi2xy!(y_k,&img11), 4, Scalar::from((255, 255, 255)), 2, imgproc::LINE_8, 0);  // predicted (in white)
+      imgproc::circle(&mut img, phi2xy!(x_k,&img11), 4, Scalar::from((0, 0, 255)), 3, imgproc::LINE_8, 0);  // actual to (in red)
                                                                                                      // planar co-ordinates and draw
       highgui::imshow("Kalman", &img);
 
