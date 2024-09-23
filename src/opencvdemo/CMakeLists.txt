@@ -87,6 +87,9 @@ message(STATUS "OpenCV_CUDA: ${OpenCV_CUDA}")
 #
 # Add the project
 #
+add_executable( example_12-01 src/example_13-01.cpp )
+target_link_libraries( example_12-01 ${OpenCV_LIBS} )
+
 add_executable( example_13-01 src/example_13-01.cpp )
 target_link_libraries( example_13-01 ${OpenCV_LIBS} )
 

@@ -151,7 +151,7 @@ void adjustThresholds(char** argv, cv::Mat &img) {
 		if(key == 'l') { low_thresh -= 0.2;}	
 		if(key == 'H') { high_thresh += 0.2;}
 		if(key == 'h') { high_thresh -= 0.2;}
-		cout << "H or h, L or l, esq or q to quit;  high_thresh = " << high_thresh << ", " << "low_thresh = " << low_thresh << endl;
+		cout << "H or h, L or l, esc or q to quit;  high_thresh = " << high_thresh << ", " << "low_thresh = " << low_thresh << endl;
 		setHighThreshold(high_thresh);
 		setLowThreshold(low_thresh);
 		backgroundDiff(img, mask);
@@ -192,7 +192,7 @@ int main( int argc, char** argv) {
 	//
 	cout << "Creating the background model" << endl;
 	createModelsfromStats();
-	cout << "Done!  Hit any key to continue into single step. Hit 'a' or 'A' to adjust thresholds, esq, 'q' or 'Q' to quit\n" << endl;
+	cout << "Done!  Hit any key to continue into single step. Hit 'a' or 'A' to adjust thresholds, esc, 'q' or 'Q' to quit\n" << endl;
 	
 	// SECOND PROCESSING LOOP (TESTING):
 	//
@@ -209,9 +209,9 @@ int main( int argc, char** argv) {
 		showForgroundInRed( argv, image);
 		if(key == 'a') {
 			cout << "In adjust thresholds, 'H' or 'h' == high thresh up or down; 'L' or 'l' for low thresh up or down." << endl;
-			cout << " esq, 'q' or 'Q' to quit " << endl;
+			cout << " esc, 'q' or 'Q' to quit " << endl;
 			adjustThresholds(argv, image);
-			cout << "Done with adjustThreshold, back to frame stepping, esq, q or Q to quit." << endl;
+			cout << "Done with adjustThreshold, back to frame stepping, esc, q or Q to quit." << endl;
 		}
 	}
 	exit(0);
