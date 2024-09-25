@@ -14,10 +14,10 @@ use opencv::{highgui, core, imgcodecs, objdetect, features2d, videoio, calib3d, 
 use std::time::{SystemTime, UNIX_EPOCH};
 
 fn StereoCalib(imageList:&str, nx:i32, ny:i32,
-                        useUncalibrated:bool) {
+                        useUncalibrated:bool) -> Result<()> {
   let displayCorners = true;
   let showUndistorted = true;
-  let isVerticalStereo = false; // horiz or vert cams
+  let mut isVerticalStereo = false; // horiz or vert cams
   const maxScale:i32 = 1i32;
   const squareSize:f32 = 1.f32;
 
@@ -63,8 +63,8 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
     let img_1_path = Path::new("E:/app/julia/Learning-OpenCV-3_examples/").join(buf);
     let img = imgcodecs::imread(img_1_path.to_str().unwrap(), imgcodecs::IMREAD_COLOR)?;
     if img.size()?.width == 0 { break; }
-    imageSize = img.size();
-    imageNames[lr].push_back(buf);
+    imageSize = img.size().unwrap();
+    imageNames[lr].push(buf);
     i+=1;
 
     // If we did not find board on the left image,
@@ -116,8 +116,8 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
   }
 
   // CALIBRATE THE STEREO CAMERAS
-  let M1 = Mat::eye(3, 3, core::CV_64F).unwrap().to_mat();
-  let M2 = Mat::eye(3, 3, core::CV_64F).unwrap().to_mat();
+  let M1 = Mat::eye(3, 3, core::CV_64F).unwrap().to_mat().unwrap();
+  let M2 = Mat::eye(3, 3, core::CV_64F).unwrap().to_mat().unwrap();
   let mut D1=Mat::default();
   let mut D2=Mat::default();
   let mut R=Mat::default();
@@ -149,14 +149,14 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
     calib3d::compute_correspond_epilines(&pt1, 2, &F, &mut lines[1]);
 
     for j in 0..N {
-      double err = fabs(pt0[j].x * lines[1][j].x + pt0[j].y * lines[1][j].y +
-                        lines[1][j].z) +
-                   fabs(pt1[j].x * lines[0][j].x + pt1[j].y * lines[0][j].y +
-                        lines[0][j].z);
+      let err = (pt0[j].x * lines[1][j].x + pt0[j].y * lines[1][j].y +
+                        lines[1][j].z).fabs() +
+                   (pt1[j].x * lines[0][j].x + pt1[j].y * lines[0][j].y +
+                        lines[0][j].z).fabs();
       avgErr += err;
     }
   }
-  cout << "avg err = " << avgErr / (nframes * N) << endl;
+  println!("avg err = {}", avgErr / (nframes * N));
 
   // COMPUTE AND DISPLAY RECTIFICATION
   //
@@ -173,14 +173,14 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
     // IF BY CALIBRATED (BOUGUET'S METHOD)
     //
     if !useUncalibrated {
-      stereoRectify(M1, D1, M2, D2, imageSize, R, T, R1, R2, P1, P2,
-                    cv::noArray(), 0);
-      isVerticalStereo = fabs(P2.at<double>(1, 3)) > fabs(P2.at<double>(0, 3));
+      calib3d::stereo_rectify_def(&M1, &D1, &M2, &D2, imageSize, &R, &T, &mut R1, &mut R2, &mut P1, &mut P2,
+          &mut core::no_array());
+      isVerticalStereo = (P2.at_2d<f64>(1, 3)).fabs() > (P2.at_2d<f64>(0, 3)).fabs();
       // Precompute maps for cvRemap()
-      initUndistortRectifyMap(M1, D1, R1, P1, imageSize, CV_16SC2, map11,
-                              map12);
-      initUndistortRectifyMap(M2, D2, R2, P2, imageSize, CV_16SC2, map21,
-                              map22);
+      calib3d::init_undistort_rectify_map(&M1, &D1, &R1, &P1, imageSize, core::CV_16SC2, &mut map11,
+          &mut map12);
+      calib3d::init_undistort_rectify_map(&M2, &D2, &R2, &P2, imageSize, core::CV_16SC2, &mut map21,
+          &mut map22);
     }
 
     // OR ELSE HARTLEY'S METHOD
@@ -251,22 +251,22 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
         highgui::imshow("disparity", &vdisp);
       }
       if !isVerticalStereo {
-        let part = pair.col_range(core::Range::new(0, imageSize.width)).unwrap().clone_pointee();
+        let part = pair.col_range(&core::Range::new(0, imageSize.width)).unwrap().clone_pointee();
         imgproc::cvt_color_def(&img1r, &mut part, imgproc::COLOR_GRAY2BGR);
-        part = pair.col_range(core::Range::new(imageSize.width, imageSize.width * 2));
+        part = pair.col_range(&core::Range::new(imageSize.width, imageSize.width * 2));
         imgproc::cvt_color_def(&img2r, &mut part, imgproc::COLOR_GRAY2BGR);
         for j in (0..imageSize.height).step_by(16) {
-          imgproc::line(&mut pair, Point::new(0, j), Point::new(imageSize.width * 2, j),
-              core::Scalar::new(0, 255, 0));
+          imgproc::line_def(&mut pair, Point::new(0, j), Point::new(imageSize.width * 2, j),
+              core::Scalar::new(0., 255., 0., 0.));
         }
       } else {
-        let part = pair.col_range(core::Range::new(0, imageSize.height));
+        let part = pair.col_range(&core::Range::new(0, imageSize.height));
         imgproc::cvt_color_def(&img1r, &mut part, imgproc::COLOR_GRAY2BGR);
-        part = pair.col_range(core::Range::new(imageSize.height, imageSize.height * 2));
+        part = pair.col_range(&core::Range::new(imageSize.height, imageSize.height * 2));
         imgproc::cvt_color_def(&img2r, &mut part, imgproc::COLOR_GRAY2BGR);
         for j in (0..imageSize.width).step_by(16) {
-          imgproc::line(&mut pair, Point::new(j, 0), Point::new(j, imageSize.height * 2),
-              core::Scalar::new(0, 255, 0));
+          imgproc::line_def(&mut pair, Point::new(j, 0), Point::new(j, imageSize.height * 2),
+              core::Scalar::new(0., 255., 0., 0.));
         }
       }
       highgui::imshow("rectified", &pair);
@@ -276,6 +276,8 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
       }
     }
   }
+
+  Ok(())
 }
 
 fn main() -> Result<()> {

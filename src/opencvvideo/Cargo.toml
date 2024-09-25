@@ -11,6 +11,10 @@ path = "src/bin/qr.rs"
 name = "video_facedetect"
 path = "src/bin/video_facedetect.rs"
 
+[[bin]]
+name = "crud"
+path = "src/crud.rs"
+
 [features]
 blas = ["ndarray-linalg", "linfa/ndarray-linalg"]
 serde = ["serde_crate", "ndarray/serde", "serde_regex"]
@@ -40,6 +44,21 @@ ceres-solver = { version = "0.3.0", features = ["source"] }
 
 rand = "0.8.5"
 pdqselect = "0.1.1"
+
+#serde and base types
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+#log lib
+log = "0.4"
+fast_log = "1.7"
+
+tokio = { version = "1", features = ["full"] }
+rbs = { version = "4.5.30", path = "../rbs" }
+rbatis = { version = "4.5.30", features = ["debug_mode"], path = "../" }
+#rbdc-sqlite = { version = "4.5.30", path = "../rbdc-sqlite" }
+#rbdc-mysql = { version = "4.5.30", path = "../rbdc-mysql" }
+rbdc-pg = { version = "4.5.30", path = "../rbdc-pg" }
+#rbdc-mssql = { version = "4.5.30", path = "../rbdc-mssql" }
 
 [target.'cfg(not(target_env = "msvc"))'.dependencies]
 jemallocator = "0.5.4"
