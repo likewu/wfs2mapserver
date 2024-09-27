@@ -5,6 +5,7 @@ use std::env;
 use std::process::exit;
 use std::path::Path;
 use std::fs::File;
+use std::ptr;
 use std::slice::from_raw_parts;
 
 use opencv::{highgui, core, imgcodecs, objdetect, features2d, videoio, calib3d, imgproc, prelude::*, Result,
@@ -42,7 +43,7 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
   for i in 0..ny {
     for j in 0..nx {
       boardModel.push(
-          core::Point3f::new((i * squareSize) as f32, (j * squareSize) as f32, 0.f32));
+          core::Point3f::new((i as f32 * squareSize) as f32, (j as f32 * squareSize) as f32, 0.0f32));
     }
   }
   i = 0;
@@ -57,7 +58,7 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
       break;
     }
     let len = buf.len();
-    if buf[0] == '#' {
+    if buf[0 as usize] == '#' {
       continue;
     }
     let img_1_path = Path::new("E:/app/julia/Learning-OpenCV-3_examples/").join(buf);
@@ -139,20 +140,22 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
   // epipolar geometry constraint: m2^t*F*m1=0
   let lines=[Vector::<Point3f>::new();2];
   let avgErr = 0;
-  let nframes = objectPoints.size();
+  let nframes = objectPoints.len();
   for i in 0..nframes {
-    let pt0 = &points[0].get(i);
-    let pt1 = &points[1].get(i);
-    calib3d::undistort_points(&pt0, &mut pt0, &M1, &D1, Mat::default(), &M1);
-    calib3d::undistort_points(&pt1, &mut pt1, &M2, &D2, Mat::default(), &M2);
+    let mut pt0 = &points[0].get(i as usize).unwrap();
+    let mut pt1 = &points[1].get(i as usize).unwrap();
+    let pt011=pt0.clone();
+    let pt111=pt1.clone();
+    calib3d::undistort_points(&pt011, &mut pt0, &M1, &D1, &Mat::default(), &M1);
+    calib3d::undistort_points(&pt111, &mut pt1, &M2, &D2, &Mat::default(), &M2);
     calib3d::compute_correspond_epilines(&pt0, 1, &F, &mut lines[0]);
     calib3d::compute_correspond_epilines(&pt1, 2, &F, &mut lines[1]);
 
     for j in 0..N {
-      let err = (pt0[j].x * lines[1][j].x + pt0[j].y * lines[1][j].y +
-                        lines[1][j].z).fabs() +
-                   (pt1[j].x * lines[0][j].x + pt1[j].y * lines[0][j].y +
-                        lines[0][j].z).fabs();
+      let err = (pt0.get(j as usize).unwrap().x * lines[1].get(j as usize).unwrap().x + pt0.get(j as usize).unwrap().y * lines[1].get(j as usize).unwrap().y +
+                        lines[1].get(j as usize).unwrap().z).abs() +
+                   (pt1.get(j as usize).unwrap().x * lines[0].get(j).unwrap().x + pt1.get(j as usize).unwrap().y * lines[0].get(j as usize).unwrap().y +
+                        lines[0].get(j as usize).unwrap().z).abs();
       avgErr += err;
     }
   }
@@ -175,7 +178,7 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
     if !useUncalibrated {
       calib3d::stereo_rectify_def(&M1, &D1, &M2, &D2, imageSize, &R, &T, &mut R1, &mut R2, &mut P1, &mut P2,
           &mut core::no_array());
-      isVerticalStereo = (P2.at_2d<f64>(1, 3)).fabs() > (P2.at_2d<f64>(0, 3)).fabs();
+      isVerticalStereo = (P2.at_2d::<f64>(1, 3).unwrap()).abs() > (P2.at_2d::<f64>(0, 3).unwrap()).abs();
       // Precompute maps for cvRemap()
       calib3d::init_undistort_rectify_map(&M1, &D1, &R1, &P1, imageSize, core::CV_16SC2, &mut map11,
           &mut map12);
@@ -192,18 +195,17 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
       // from the fundamental matrix
       let mut allpoints=[Vector::<Point2f>::new();2];
       for i in 0..nframes {
-        copy(points[0][i].begin(), points[0][i].end(),
-             back_inserter(allpoints[0]));
-        copy(points[1][i].begin(), points[1][i].end(),
-             back_inserter(allpoints[1]));
+        unsafe {ptr::copy(points[0].get(i).unwrap().as_raw() as *const f32, allpoints[0].as_raw_mut() as *mut f32, points[0].len() * mem::size_of::<f32>());}
+        //copy(points[1][i].begin(), points[1][i].end(),
+        //     back_inserter(allpoints[1]));
       }
       let F = calib3d::find_fundamental_mat_1(&allpoints[0], &allpoints[1], calib3d::FM_8POINT, 3.0, 0.99, &mut core::no_array()).unwrap();
       let mut H1=Mat::default();
       let mut H2=Mat::default();
       calib3d::stereo_rectify_uncalibrated(&allpoints[0], &allpoints[1], &F, imageSize,
-                                    &mut H1, &mut H2, 3);
-      R1 = (M1.inv() * H1 * M1).into_result().unwrap().to_mat()?;
-      R2 = (M2.inv() * H2 * M2).into_result().unwrap().to_mat()?;
+                                    &mut H1, &mut H2, 3.);
+      R1 = (M1.inv_def().unwrap().to_mat()? * H1 * M1).into_result().unwrap().to_mat()?;
+      R2 = (M2.inv_def().unwrap().to_mat()? * H2 * M2).into_result().unwrap().to_mat()?;
 
       // Precompute map for cvRemap()
       //
@@ -246,23 +248,23 @@ fn StereoCalib(imageList:&str, nx:i32, ny:i32,
         // image, so the epipolar lines in the rectified
         // images are vertical. Stereo correspondence
         // function does not support such a case.
-        stereo.compute(&img1r, &img2r, &disp);
+        stereo.compute(&img1r, &img2r, &mut disp);
         core::normalize(&disp, &mut vdisp, 0., 256., core::NORM_MINMAX, core::CV_8U, &core::no_array());
         highgui::imshow("disparity", &vdisp);
       }
       if !isVerticalStereo {
-        let part = pair.col_range(&core::Range::new(0, imageSize.width)).unwrap().clone_pointee();
+        let part = pair.col_range(&core::Range::new(0, imageSize.width).unwrap()).unwrap().clone_pointee();
         imgproc::cvt_color_def(&img1r, &mut part, imgproc::COLOR_GRAY2BGR);
-        part = pair.col_range(&core::Range::new(imageSize.width, imageSize.width * 2));
+        part = pair.col_range(&core::Range::new(imageSize.width, imageSize.width * 2).unwrap()).unwrap().clone_pointee();
         imgproc::cvt_color_def(&img2r, &mut part, imgproc::COLOR_GRAY2BGR);
         for j in (0..imageSize.height).step_by(16) {
           imgproc::line_def(&mut pair, Point::new(0, j), Point::new(imageSize.width * 2, j),
               core::Scalar::new(0., 255., 0., 0.));
         }
       } else {
-        let part = pair.col_range(&core::Range::new(0, imageSize.height));
+        let part = pair.col_range(&core::Range::new(0, imageSize.height).unwrap()).unwrap().clone_pointee();
         imgproc::cvt_color_def(&img1r, &mut part, imgproc::COLOR_GRAY2BGR);
-        part = pair.col_range(&core::Range::new(imageSize.height, imageSize.height * 2));
+        part = pair.col_range(&core::Range::new(imageSize.height, imageSize.height * 2).unwrap()).unwrap().clone_pointee();
         imgproc::cvt_color_def(&img2r, &mut part, imgproc::COLOR_GRAY2BGR);
         for j in (0..imageSize.width).step_by(16) {
           imgproc::line_def(&mut pair, Point::new(j, 0), Point::new(j, imageSize.height * 2),

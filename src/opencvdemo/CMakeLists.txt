@@ -97,3 +97,6 @@ add_executable( example_15-02 src/example_15-02.cpp )
 #add_dependencies(main std.compat)
 #target_link_libraries(main std.compat)
 target_link_libraries( example_15-02 ${OpenCV_LIBS} )
+
+add_executable( example_19-03 src/example_19-03.cpp )
+target_link_libraries( example_19-03 ${OpenCV_LIBS} )

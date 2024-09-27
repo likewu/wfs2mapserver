@@ -29,6 +29,10 @@ pub struct Activity {
 //crud!(Activity {},"activity");
 crud!(Activity {}); // impl_insert!($table {}) + impl_select!($table {}) + impl_update!($table {}) + impl_delete!($table {});
 
+#[sql("select * from biz_activity where id = ?")]
+pub async fn select(rb: &RBatis, name: &str) -> Activity {}
+//or： pub async fn select(name: &str) -> rbatis::core::Result<BizActivity> {}
+
 #[tokio::main]
 pub async fn main() {
     _ = fast_log::init(fast_log::Config::new().console().level(LevelFilter::Debug));
@@ -46,7 +50,7 @@ pub async fn main() {
     //)
     //.unwrap();
     // table sync done
-    sync_table(&rb).await;
+    //sync_table(&rb).await;
 
     let table = Activity {
         id: Some("2".into()),

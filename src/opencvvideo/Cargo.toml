@@ -53,12 +53,12 @@ log = "0.4"
 fast_log = "1.7"
 
 tokio = { version = "1", features = ["full"] }
-rbs = { version = "4.5.30", path = "../rbs" }
-rbatis = { version = "4.5.30", features = ["debug_mode"], path = "../" }
-#rbdc-sqlite = { version = "4.5.30", path = "../rbdc-sqlite" }
-#rbdc-mysql = { version = "4.5.30", path = "../rbdc-mysql" }
-rbdc-pg = { version = "4.5.30", path = "../rbdc-pg" }
-#rbdc-mssql = { version = "4.5.30", path = "../rbdc-mssql" }
+rbs = { version = "4.5.20" }
+rbatis = { version = "4.5.30", features = ["debug_mode"] }
+#rbdc-sqlite = { version = "4.5.30" }
+#rbdc-mysql = { version = "4.5.30" }
+rbdc-pg = { version = "4.5.14" }
+#rbdc-mssql = { version = "4.5.30" }
 
 [target.'cfg(not(target_env = "msvc"))'.dependencies]
 jemallocator = "0.5.4"

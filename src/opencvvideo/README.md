@@ -42,6 +42,12 @@ D:\.cargo\registry\src\mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd\ceres-solve
 D:\.cargo\registry\src\mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd\ceres-solver-sys-0.3.0\src\lib.h
 #define GLOG_NO_ABBREVIATED_SEVERITIES
 
+D:\.cargo\registry\src\mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd\ceres-solver-src-0.3.0+ceres2.2.0-eigen3.4.0-glog0.7.0\build.rs
+.define("GLOG_USE_GLOG_EXPORT", "ON")
+.cflag("/std:c++17")
+D:\.cargo\registry\src\mirrors.tuna.tsinghua.edu.cn-df7c3c540f42cdbd\ceres-solver-src-0.3.0+ceres2.2.0-eigen3.4.0-glog0.7.0\vendor\ceres-solver\CMakeLists.txt
+add_definitions("-DGLOG_USE_GLOG_EXPORT")
+
 D:\Programs\vcpkg\vcpkg integrate install
 
 
