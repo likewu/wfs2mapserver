@@ -23,11 +23,11 @@ int getMaxAreaContourId(vector <vector<cv::Point>> contours) {
 }
 
 //lower and upper color values of tracked color -> set to blue default
-int colorLower[] = { 104,146,102 };
-int colorUpper[] = { 179,255,255 };
-cv::Mat res=cv::Mat::zeros(140, 520, CV_8UC3);
-cv::Rect lowerBox(0,40,260,60);
-cv::Rect upperBox(260,40,260,60);
+int colorLower[] = { 23,84,32 };
+int colorUpper[] = { 77,255,102 };
+cv::Mat res=cv::Mat::zeros(120, 480, CV_8UC3);
+cv::Rect lowerBox(0,20,240,60);
+cv::Rect upperBox(240,20,240,60);
 
 void switch_callback(
   int pos, // Trackbar slider position
@@ -52,7 +52,8 @@ int main() {
   }
 
    //trackbars to change values of lower and upper 
-   namedWindow("Trackbars");
+   namedWindow("Trackbars", WINDOW_NORMAL);
+   resizeWindow("Trackbars", 480, 380);
    createTrackbar("ColorLower[0]", "Trackbars", &colorLower[0], 255, switch_callback);
    createTrackbar("ColorLower[1]", "Trackbars", &colorLower[1], 255, switch_callback);
    createTrackbar("ColorLower[2]", "Trackbars", &colorLower[2], 255, switch_callback);
