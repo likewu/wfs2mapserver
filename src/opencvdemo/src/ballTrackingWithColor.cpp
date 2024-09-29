@@ -22,6 +22,22 @@ int getMaxAreaContourId(vector <vector<cv::Point>> contours) {
    return maxAreaContourId;
 }
 
+//lower and upper color values of tracked color -> set to blue default
+int colorLower[] = { 104,146,102 };
+int colorUpper[] = { 179,255,255 };
+cv::Mat res=cv::Mat::zeros(140, 520, CV_8UC3);
+cv::Rect lowerBox(0,40,260,60);
+cv::Rect upperBox(260,40,260,60);
+
+void switch_callback(
+  int pos, // Trackbar slider position
+  void* param = NULL // Parameters from cv::setTrackbarCallback()
+) {
+   cv::rectangle(res, lowerBox, CV_RGB(colorLower[0],colorLower[1],colorLower[2]), -1);
+   cv::rectangle(res, upperBox, CV_RGB(colorUpper[0],colorUpper[1],colorUpper[2]), -1);
+   cv::imshow("Trackbars", res);
+}
+
 int main() {
 
   deque <Point2f> trackPoints;
@@ -35,18 +51,14 @@ int main() {
       return EXIT_FAILURE;
   }
 
-   //lower and upper color values of tracked color -> set to blue default
-   int colorLower[] = { 104,146,102 };
-   int colorUpper[] = { 179,255,255 };
-
    //trackbars to change values of lower and upper 
    namedWindow("Trackbars");
-   createTrackbar("ColorLower[0]", "Trackbars", &colorLower[0], 255);
-   createTrackbar("ColorLower[1]", "Trackbars", &colorLower[1], 255);
-   createTrackbar("ColorLower[2]", "Trackbars", &colorLower[2], 255);
-   createTrackbar("ColorUpper[0]", "Trackbars", &colorUpper[0], 255);
-   createTrackbar("ColorUpper[1]", "Trackbars", &colorUpper[1], 255);
-   createTrackbar("ColorUpper[2]", "Trackbars", &colorUpper[2], 255);
+   createTrackbar("ColorLower[0]", "Trackbars", &colorLower[0], 255, switch_callback);
+   createTrackbar("ColorLower[1]", "Trackbars", &colorLower[1], 255, switch_callback);
+   createTrackbar("ColorLower[2]", "Trackbars", &colorLower[2], 255, switch_callback);
+   createTrackbar("ColorUpper[0]", "Trackbars", &colorUpper[0], 255, switch_callback);
+   createTrackbar("ColorUpper[1]", "Trackbars", &colorUpper[1], 255, switch_callback);
+   createTrackbar("ColorUpper[2]", "Trackbars", &colorUpper[2], 255, switch_callback);
 
    while (true)
    {
