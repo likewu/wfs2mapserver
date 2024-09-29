@@ -7,6 +7,13 @@
 #include <stdio.h>
 #include <math.h>
 
+//#define CVVISUAL_DEBUGMODE
+//#include <opencv2/cvv/debug_mode.hpp>
+//#include <opencv2/cvv/show_image.hpp>
+//#include <opencv2/cvv/filter.hpp>
+//#include <opencv2/cvv/dmatch.hpp>
+//#include <opencv2/cvv/final_show.hpp>
+
 using namespace std;
 
 void help(char *argv[]) {
@@ -83,11 +90,13 @@ static void StereoCalib(const char *imageList, int nx, int ny,
       buf[--len] = '\0';
     if (buf[0] == '#')
       continue;
-    cv::Mat img = cv::imread("E:/app/julia/Learning-OpenCV-3_examples/stereoData/"+string(buf), 0);
+    string aa="E:/app/julia/Learning-OpenCV-3_examples/stereoData/"+string(buf);
+    cv::Mat img = cv::imread(aa, 0);
     if (img.empty())
       break;
+    //cvv::showImage(img, CVVISUAL_LOCATION, imgIdString.c_str());
     imageSize = img.size();
-    imageNames[lr].push_back(buf);
+    imageNames[lr].push_back(aa);
     i++;
 
     // If we did not find board on the left image,
@@ -121,6 +130,7 @@ static void StereoCalib(const char *imageList, int nx, int ny,
       cout << buf << endl;
       cv::Mat cimg;
       cv::cvtColor(img, cimg, cv::COLOR_GRAY2BGR);
+      //cvv::debugFilter(img, cimg, CVVISUAL_LOCATION, "to rbg");
 
       // draw chessboard corners works for circle grids too
       cv::drawChessboardCorners(cimg, cv::Size(nx, ny), corners[lr], found[lr]);
