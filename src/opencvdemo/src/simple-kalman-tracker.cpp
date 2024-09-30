@@ -28,6 +28,8 @@ using namespace std;
 #define MAX_H_BLUE 300
 // <<<<< Color to be tracked
 
+int colorLower[] = { 32,84,54 };
+int colorUpper[] = { 112,255,115 };
 
 int main()
 {
@@ -156,6 +158,7 @@ int main()
 
         // >>>>> Noise smoothing
         cv::Mat blur;
+        //cv::GaussianBlur(frame, blur, cv::Size(11, 11), 0);
         cv::GaussianBlur(frame, blur, cv::Size(5, 5), 3.0, 3.0);
         // <<<<< Noise smoothing
 
@@ -167,8 +170,9 @@ int main()
         // >>>>> Color Thresholding
         // Note: change parameters for different colors
         cv::Mat rangeRes = cv::Mat::zeros(frame.size(), CV_8UC1);
-        cv::inRange(frmHsv, cv::Scalar(MIN_H_BLUE / 2, 100, 80),
-                    cv::Scalar(MAX_H_BLUE / 2, 255, 255), rangeRes);
+        //create a mask for blue
+        cv::inRange(frmHsv, cv::Scalar(colorLower[0], colorLower[1], colorLower[2]), cv::Scalar(colorUpper[0], colorUpper[1], colorUpper[2]), rangeRes);
+        //cv::inRange(frmHsv, cv::Scalar(MIN_H_BLUE / 2, 100, 80), cv::Scalar(MAX_H_BLUE / 2, 255, 255), rangeRes);
         // <<<<< Color Thresholding
 
         // >>>>> Improving the result
@@ -181,7 +185,8 @@ int main()
 
         // >>>>> Contours detection
         vector<vector<cv::Point> > contours;
-        cv::findContours(rangeRes, contours, cv::RETR_EXTERNAL,
+        vector<cv::Vec4i> hierarchy;
+        cv::findContours(rangeRes, contours, hierarchy, cv::RETR_EXTERNAL,
                          cv::CHAIN_APPROX_NONE);
         // <<<<< Contours detection
 
