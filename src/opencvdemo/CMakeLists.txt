@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 3.26.0 FATAL_ERROR)
+
+#set(CMAKE_TOOLCHAIN_FILE D:/Programs/vcpkg/scripts/buildsystems/vcpkg.cmake
+#  CACHE STRING "Vcpkg toolchain file")
+
 project("example"
   LANGUAGES CXX
 )
@@ -70,6 +74,10 @@ add_link_options(-fuse-ld=lld -stdlib=libc++ -Wl,--color-diagnostics -fdiagnosti
 find_package( OpenCV REQUIRED )
 find_package( OpenGL )
 
+find_package(Ceres REQUIRED)
+#Eigen库只需要添加头文件
+#include_directories("D:/Programs/vcpkg/packages/eigen3_x64-windows/eigen3/include")
+
 if(OPENGL_FOUND)
   include_directories( ${OpenCV_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} )
 else()
@@ -111,3 +119,8 @@ add_executable( ballTrackingWithColor src/ballTrackingWithColor.cpp )
 target_link_libraries( ballTrackingWithColor ${OpenCV_LIBS} )
 add_executable( ballTrackingWithHoughCircles src/ballTrackingWithHoughCircles.cpp )
 target_link_libraries( ballTrackingWithHoughCircles ${OpenCV_LIBS} )
+
+add_executable( pose_estimation_2d2d src/pose_estimation_2d2d.cpp )
+target_link_libraries( pose_estimation_2d2d ${OpenCV_LIBS} )
+add_executable( bundle_adjustment_ceres src/bundle_adjustment_ceres.cpp src/common.cpp )
+target_link_libraries( bundle_adjustment_ceres ${OpenCV_LIBS} ${CERES_LIBRARIES} )

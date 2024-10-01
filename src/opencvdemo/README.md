@@ -6,6 +6,8 @@ $env:PATH += ";D:\LLVM-19.1.0-Windows-X64\bin;D:\Programs\opencv\build\x64\vc16\
 
 $env:OpenCV_DIR = "D:\Programs\opencv\build"
 cmake -G Ninja -S . -B build -DCMAKE_CXX_COMPILER=D:/LLVM-19.1.0-Windows-X64/bin/clang++.exe -DLIBCXX_BUILD=D:/LLVM-19.1.0-Windows-X64 -DOpenCV_RUNTIME=vc16 -DOpenCV_ARCH=x64
+-DCMAKE_TOOLCHAIN_FILE=D:/Programs/vcpkg/scripts/buildsystems/vcpkg.cmake
+-DVCPKG_TARGET_TRIPLET=x64-windows
  -DOpenCV_STATIC=ON
 ninja -C build
 .\build\example_15-02.exe 50 tree.avi
