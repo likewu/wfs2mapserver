@@ -89,7 +89,7 @@ fn main() -> Result<()> {
       x_k = (&kalman.transition_matrix() * &x_k + &w_k).into_result().unwrap().to_mat()?;
 
       // exit if user hits 'Esc'
-      let key = highgui::wait_key(0).unwrap() as u8 & 255;
+      let key = highgui::wait_key(100).unwrap() as u8 & 255;
       if key == 27 {
         break;
       }

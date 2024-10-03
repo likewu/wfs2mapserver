@@ -106,6 +106,11 @@ add_executable( example_15-02 src/example_15-02.cpp )
 #target_link_libraries(main std.compat)
 target_link_libraries( example_15-02 ${OpenCV_LIBS} )
 
+add_executable( example_17-01 src/example_17-01.cpp )
+target_link_libraries( example_17-01 ${OpenCV_LIBS} )
+add_executable( example_17-02 src/example_17-02.cpp )
+target_link_libraries( example_17-02 ${OpenCV_LIBS} )
+
 add_executable( example_19-03 src/example_19-03.cpp )
 target_link_libraries( example_19-03 ${OpenCV_LIBS} )
 
@@ -122,5 +127,5 @@ target_link_libraries( ballTrackingWithHoughCircles ${OpenCV_LIBS} )
 
 add_executable( pose_estimation_2d2d src/pose_estimation_2d2d.cpp )
 target_link_libraries( pose_estimation_2d2d ${OpenCV_LIBS} )
-add_executable( bundle_adjustment_ceres src/bundle_adjustment_ceres.cpp src/common.cpp )
-target_link_libraries( bundle_adjustment_ceres ${OpenCV_LIBS} ${CERES_LIBRARIES} )
+#add_executable( bundle_adjustment_ceres src/bundle_adjustment_ceres.cpp src/common.cpp )
+#target_link_libraries( bundle_adjustment_ceres ${OpenCV_LIBS} ${CERES_LIBRARIES} )
