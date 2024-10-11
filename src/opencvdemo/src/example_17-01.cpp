@@ -60,21 +60,37 @@ int main(int argc, char** argv) {
     cv::setIdentity(kalman.processNoiseCov, cv::Scalar(1e-5));
     cv::setIdentity(kalman.measurementNoiseCov, cv::Scalar(1e-1));
     cv::setIdentity(kalman.errorCovPost, cv::Scalar(1));
+    cout << "\n"
+         "t" << kalman.transitionMatrix << "m" << kalman.measurementMatrix << " mn" << kalman.measurementNoiseCov << endl;
 
     // choose random initial state
     //
-    randn(kalman.statePost, 0.0, 0.1);
+    //randn(kalman.statePost, 0.0, 0.1);
+    kalman.statePost = x_k;
+    cout << "\n"
+         << "Example 17-1: code for using cv::KalmanFilter\n"
+         << argv[0] << "\n\n"
+         << "For example:\n"
+         << argv[0] <<"\n\n"
+         << "Esc to quit\n"
+         << endl;
+    cout << "\n"
+         << "Initial x_k" << x_k << " x" << kalman.statePost << " X" << kalman.errorCovPost << endl;
 
     for (;;) {
         // predict point position
         //
         cv::Mat y_k = kalman.predict();
+        cout << "\n"
+          << "Predict x" << kalman.statePost << " X" << kalman.errorCovPost << endl;
 
         // generate measurement (z_k)
         //
         cv::randn(z_k, 0.0,
             sqrt(static_cast<double>(kalman.measurementNoiseCov.at<float>(0, 0))));
         z_k = kalman.measurementMatrix*x_k + z_k;
+        cout << "\n"
+          << "z_k" << z_k << endl;
 
         // plot points (e.g., convert
         //
@@ -89,6 +105,8 @@ int main(int argc, char** argv) {
         // adjust Kalman filter state
         //
         kalman.correct(z_k);
+        cout << "\n"
+          << "Observe x" << kalman.statePost << " X" << kalman.errorCovPost << endl;
 
         // Apply the transition matrix 'F' (e.g., step time forward)
         // and also apply the "process" noise w_k

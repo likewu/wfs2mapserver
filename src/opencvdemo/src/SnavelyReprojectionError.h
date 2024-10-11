@@ -39,7 +39,7 @@ public:
         p[1] += camera[4];
         p[2] += camera[5];
 
-        // Compute the center fo distortion
+        // Compute the center of distortion
         T xp = -p[0] / p[2];
         T yp = -p[1] / p[2];
 
