@@ -46,11 +46,16 @@ endif()
 
 add_compile_definitions(-D_LIBCPP_REMOVE_TRANSITIVE_INCLUDES)
 add_compile_options(-fdiagnostics-color -pedantic-errors -Wall -Wextra -Wdeprecated
-  -fexperimental-library -stdlib=libc++
+  -fexperimental-library -stdlib=libc++ -finput-charset=utf-8 -fexec-charset=utf-8
   #-cxx-isystem ${LIBCXX_BUILD}/include/c++/v1
   )
 add_link_options(-fuse-ld=lld -stdlib=libc++ -Wl,--color-diagnostics -fdiagnostics-color
   -fexperimental-library)
+
+if(CMAKE_C_COMPILER_ID STREQUAL "MSVC")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /source-charset:utf-8 /execution-charset:gbk")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /source-charset:utf-8 /execution-charset:gbk")
+endif()
 
 #message(STATUS "std_SOURCE_DIR: ${std_SOURCE_DIR}")
 
@@ -78,6 +83,8 @@ find_package(Ceres REQUIRED)
 #Eigen库只需要添加头文件
 #include_directories("D:/Programs/vcpkg/packages/eigen3_x64-windows/eigen3/include")
 
+find_package(Iconv REQUIRED)
+
 if(OPENGL_FOUND)
   include_directories( ${OpenCV_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIRS} )
 else()
@@ -95,8 +102,11 @@ message(STATUS "OpenCV_CUDA: ${OpenCV_CUDA}")
 #
 # Add the project
 #
-add_executable( example_12-01 src/example_13-01.cpp )
+add_executable( example_12-01 src/example_12-01.cpp )
 target_link_libraries( example_12-01 ${OpenCV_LIBS} )
+add_executable( example_12-01_dft src/example_12-01_dft.cpp )
+target_link_libraries( example_12-01_dft ${OpenCV_LIBS} )
+target_link_libraries(example_12-01_dft Iconv::Iconv)
 
 add_executable( example_13-01 src/example_13-01.cpp )
 target_link_libraries( example_13-01 ${OpenCV_LIBS} )
