@@ -61,7 +61,7 @@ int main(int argc, char** argv) {
     cv::setIdentity(kalman.measurementNoiseCov, cv::Scalar(1e-1));
     cv::setIdentity(kalman.errorCovPost, cv::Scalar(1));
     cout << "\n"
-         "t" << kalman.transitionMatrix << "m" << kalman.measurementMatrix << " mn" << kalman.measurementNoiseCov << endl;
+         << "t" << kalman.transitionMatrix << "m" << kalman.measurementMatrix << " mn" << kalman.measurementNoiseCov << endl;
 
     // choose random initial state
     //

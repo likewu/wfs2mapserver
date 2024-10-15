@@ -89,6 +89,11 @@ int main()
     cv::setIdentity(kf.measurementNoiseCov, cv::Scalar(1e-1));
     // <<<< Kalman Filter
 
+    cout << "\n"
+         << "t\n" << kf.transitionMatrix << "\npn\n" << kf.processNoiseCov << endl;
+    cout << "\n"
+         << "m\n" << kf.measurementMatrix << "\nmn\n" << kf.measurementNoiseCov << endl;
+
     // Camera Index
     int idx = 0;
 
@@ -136,8 +141,8 @@ int main()
             kf.transitionMatrix.at<float>(2) = dT;
             kf.transitionMatrix.at<float>(9) = dT;
             // <<<< Matrix A
-
-            cout << "dT:" << endl << dT << endl;
+            cout << "\n"
+                << "t\n" << kf.transitionMatrix << endl;
 
             state = kf.predict();
             cout << "State post:" << endl << state << endl;
@@ -278,7 +283,7 @@ int main()
             else
                 kf.correct(meas); // Kalman Correction
 
-            cout << "Measure matrix:" << endl << meas << endl;
+            cout << "Measure value:" << endl << meas << endl;
         }
         // <<<<< Kalman Update
 
