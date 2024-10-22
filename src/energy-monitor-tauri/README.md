@@ -1,11 +1,12 @@
 # Energy Monitor Demo
 
-$env.JAVA_HOME = D:/jdk21
+$env.JAVA_HOME = D:/jdk17
 $env.ANDROID_HOME = E:\Embarcadero\Studio\22.0\PlatformSDKs\android-sdk-windows
-$env.NDK_HOME = E:\Embarcadero\Studio\22.0\PlatformSDKs\android-ndk-r21
+#$env.NDK_HOME = E:\Embarcadero\Studio\22.0\PlatformSDKs\android-ndk-r21
+$env.NDK_HOME = G:\android-ndk-r27
 cargo tauri android init 
 cargo tauri android dev
-cargo tauri android build --aab --target aarch64
+cargo tauri android build --apk --target aarch64
 
 [project]/src-tauri/gen/android/keystore.properties
 password=<password defined when keytool was executed>
