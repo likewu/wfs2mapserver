@@ -6,7 +6,7 @@
   "build": {
     "frontendDist": "../dist",
     "devUrl": "http://localhost:5173",
-    "beforeDevCommand": "rem npm run dev",
+    "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "rem npm run build"
   },
   "app": {
