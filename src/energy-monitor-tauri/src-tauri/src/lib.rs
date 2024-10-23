@@ -10,26 +10,27 @@ use tauri::Emitter;
 
 static DEMO: AtomicBool = AtomicBool::new(false);
 
+// Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
+#[tauri::command]
+fn greet(name: &str) -> String {
+    format!("Hello, {}! You've been greeted from Rust!", name)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-  tauri::Builder::default()
-    .invoke_handler(tauri::generate_handler![init_process, toggle_demo])
-    .setup(|app| {
-      if cfg!(debug_assertions) {
-        app.handle().plugin(
-          tauri_plugin_log::Builder::default()
-            .level(log::LevelFilter::Info)
-            .build(),
-        )?;
-      }
-      Ok(())
-    })
-    .run(tauri::generate_context!())
-    .expect("error while running tauri application");
+    tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
+        .invoke_handler(tauri::generate_handler![greet, toggle_demo, init_process])
+        .run(tauri::generate_context!())
+        .expect("error while running tauri application");
 }
 
 #[tauri::command]
-fn toggle_demo() -> bool {
+fn toggle_demo(window: Window) -> bool {
+  let mut rng = rand::thread_rng();
+
+  let dist=rng.gen_range(200..500);
+  window.emit("distance_emitter", dist).ok();
   !DEMO
     // Ordering::SeqCst is some low level stuff to make sure it is written consequently in memory
     .fetch_update(Ordering::SeqCst, Ordering::SeqCst, |x| Some(!x))
@@ -54,11 +55,12 @@ fn init_process(window: Window) {
 
     loop {
       if DEMO.load(Ordering::SeqCst) {
-        window.emit("distance_emitter", rng.gen_range(20,500)).ok();
+        window.emit("distance_emitter", rng.gen_range(20..500)).ok();
         thread::sleep(Duration::from_millis(100));
       } else {
-        let dist=200;
+        let dist=rng.gen_range(100..500);
         window.emit("distance_emitter", dist).ok();
+        thread::sleep(Duration::from_millis(100));
       }
     }
   });

@@ -4,10 +4,19 @@ $env.JAVA_HOME = D:/jdk17
 $env.ANDROID_HOME = E:\Embarcadero\Studio\22.0\PlatformSDKs\android-sdk-windows
 #$env.NDK_HOME = E:\Embarcadero\Studio\22.0\PlatformSDKs\android-ndk-r21
 $env.NDK_HOME = G:\android-ndk-r27
+npm run tauri android init
+npm run tauri android dev
+npm run tauri android build -- --apk --target aarch64
+
+npm run tauri dev
+npm run tauri build -- --no-bundle --target x86_64-pc-windows-msvc
+
+
 cargo tauri android init 
 cargo tauri android dev
 cargo tauri android build --apk --target aarch64
 
+cargo tauri dev
 cargo tauri build --no-bundle --target x86_64-pc-windows-msvc
 
 [project]/src-tauri/gen/android/keystore.properties
