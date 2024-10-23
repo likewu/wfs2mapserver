@@ -8,6 +8,8 @@ cargo tauri android init
 cargo tauri android dev
 cargo tauri android build --apk --target aarch64
 
+cargo tauri build --no-bundle --target x86_64-pc-windows-msvc
+
 [project]/src-tauri/gen/android/keystore.properties
 password=<password defined when keytool was executed>
 keyAlias=leafcolor
