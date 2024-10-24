@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 
 	// Load the image from the given file name.
 	//
-	cv::Mat src = cv::imread( "E:/app/julia/Learning-OpenCV-3_examples/faces.jpg" ), dst;
+	cv::Mat src = cv::imread( "E:/app/julia/Learning-OpenCV-3_examples/faces.png" ), dst;
 	if( src.empty() ) { cout << "can not load " << argv[1] << endl; return -1; }
 	sum_rgb( src, dst);
 

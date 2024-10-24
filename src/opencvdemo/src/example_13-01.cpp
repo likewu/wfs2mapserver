@@ -6,13 +6,13 @@
 using namespace std;
 
 int main( int argc, char** argv ){
-  if(argc != 2) {
+  /*if(argc != 2) {
 	  cout << "\n// Example 13-1. Histogram computation and display" << endl;
     cout << "\nComputer Color Histogram\nUsage: " <<argv[0] <<" <imagename>\n" << endl;
     return -1;
-  }
+  }*/
 
-  cv::Mat src = cv::imread( argv[1],1 );
+  cv::Mat src = cv::imread( "E:/app/julia/Learning-OpenCV-3_examples/fruits.jpg",1 );
   if( src.empty() ) { cout << "Cannot load " << argv[1] << endl; return -1; }
 
   // Compute the HSV image, and decompose it into separate planes.

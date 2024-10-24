@@ -163,13 +163,14 @@ void adjustThresholds(char** argv, cv::Mat &img) {
 int main( int argc, char** argv) {
 	namedWindow( argv[0], cv::WINDOW_AUTOSIZE );
 	VideoCapture cap;
-	if((argc < 3)|| !cap.open(argv[2])) {
+	/*if((argc < 3)|| !cap.open(argv[2])) {
 		cerr << "Couldn't run the program" << endl;
 		help(argv);
 		cap.open(0);
 		return -1;
-	}
-	int number_to_train_on = atoi( argv[1] );
+	}*/
+  cap.open("E:/app/julia/Learning-OpenCV-3_examples/tree.avi");
+	int number_to_train_on = atoi("50");
 
 	// FIRST PROCESSING LOOP (TRAINING):
 	//

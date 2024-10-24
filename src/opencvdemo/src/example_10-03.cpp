@@ -7,20 +7,20 @@ using namespace std;
 
 int main( int argc, char** argv )
 {
-	if(argc != 7) { cout << "\nExample 10-3. Threshold versus adaptive threshold\n"
+	/*if(argc != 7) { cout << "\nExample 10-3. Threshold versus adaptive threshold\n"
 	"Usage:\n" <<argv[0] <<" fixed_threshold invert(0=off|1=on) "
 	"adaptive_type(0=mean|1=gaussian) block_size offset image\n"
-	"Example:\n" <<argv[0] <<" 100 1 0 15 10 ../faces.png\n"; return -1; }
+	"Example:\n" <<argv[0] <<" 100 1 0 15 10 ../faces.png\n"; return -1; }*/
 
 	// Process command line arguments
 	//
-	double fixed_threshold = (double)atof(100);
-	int threshold_type = atoi(1) ? cv::THRESH_BINARY : cv::THRESH_BINARY_INV;
-	int adaptive_method = atoi(0) ? cv::ADAPTIVE_THRESH_MEAN_C
+	double fixed_threshold = (double)atof("100");
+	int threshold_type = atoi("1") ? cv::THRESH_BINARY : cv::THRESH_BINARY_INV;
+	int adaptive_method = atoi("0") ? cv::ADAPTIVE_THRESH_MEAN_C
 	: cv::ADAPTIVE_THRESH_GAUSSIAN_C;
-	int block_size = atoi(15);
-	double offset = (double)atof(10);
-	cv::Mat Igray = cv::imread("E:/app/julia/Learning-OpenCV-3_examples/faces.jpg", cv::IMREAD_GRAYSCALE);
+	int block_size = atoi("15");
+	double offset = (double)atof("10");
+	cv::Mat Igray = cv::imread("E:/app/julia/Learning-OpenCV-3_examples/faces.png", cv::IMREAD_GRAYSCALE);
 
 	// Read in gray image.
 	//
