@@ -77,7 +77,7 @@ endif()
 #link_libraries(std-cxx-modules)
 
 find_package( OpenCV REQUIRED )
-find_package( OpenGL )
+find_package( OpenGL REQUIRED )
 
 find_package(Ceres REQUIRED)
 #Eigen库只需要添加头文件
@@ -102,6 +102,18 @@ message(STATUS "OpenCV_CUDA: ${OpenCV_CUDA}")
 #
 # Add the project
 #
+add_executable( example_02-09 src/example_02-09.cpp )
+target_link_libraries( example_02-09 ${OpenCV_LIBS} )
+
+add_executable( example_09-04 src/example_09-04.cpp )
+target_link_libraries( example_09-04 ${OpenCV_LIBS} )
+target_link_libraries( example_09-04 O${OPENGL_LIBRARIES} )
+
+add_executable( example_10-02 src/example_10-02.cpp )
+target_link_libraries( example_10-02 ${OpenCV_LIBS} )
+add_executable( example_10-03 src/example_10-03.cpp )
+target_link_libraries( example_10-03 ${OpenCV_LIBS} )
+
 add_executable( example_12-01 src/example_12-01.cpp )
 target_link_libraries( example_12-01 ${OpenCV_LIBS} )
 add_executable( example_12-01_dft src/example_12-01_dft.cpp )
