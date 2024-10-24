@@ -176,8 +176,8 @@ int main(int argc, char** argv) {
         exit(1);
     }*/
 
-    string desc_type("surf");
-    string match_type("knn");
+    string desc_type("fastfreak");
+    string match_type("bf");
 
     string img_file1("E:/app/julia/Learning-OpenCV-3_examples/box.png");
     string img_file2("E:/app/julia/Learning-OpenCV-3_examples/box_in_scene.png");
