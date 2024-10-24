@@ -33,11 +33,11 @@ void help(char **argv) {
 
 int main(int argc, char** argv) {
 	help(argv);
-	if(argc < 2) { cout << "specify input image" << endl; return -1; }
+	//if(argc < 2) { cout << "specify input image" << endl; return -1; }
 
 	// Load the image from the given file name.
 	//
-	cv::Mat src = cv::imread( argv[1] ), dst;
+	cv::Mat src = cv::imread( "E:/app/julia/Learning-OpenCV-3_examples/faces.jpg" ), dst;
 	if( src.empty() ) { cout << "can not load " << argv[1] << endl; return -1; }
 	sum_rgb( src, dst);
 

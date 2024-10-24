@@ -78,6 +78,8 @@ endif()
 
 find_package( OpenCV REQUIRED )
 find_package( OpenGL REQUIRED )
+#find_package(GLEW REQUIRED)
+#find_package(glfw3 REQUIRED)
 
 find_package(Ceres REQUIRED)
 #Eigen库只需要添加头文件
@@ -107,7 +109,7 @@ target_link_libraries( example_02-09 ${OpenCV_LIBS} )
 
 add_executable( example_09-04 src/example_09-04.cpp )
 target_link_libraries( example_09-04 ${OpenCV_LIBS} )
-target_link_libraries( example_09-04 O${OPENGL_LIBRARIES} )
+target_link_libraries( example_09-04 ${OPENGL_LIBRARIES} )
 
 add_executable( example_10-02 src/example_10-02.cpp )
 target_link_libraries( example_10-02 ${OpenCV_LIBS} )

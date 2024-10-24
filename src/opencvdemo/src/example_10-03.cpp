@@ -14,13 +14,13 @@ int main( int argc, char** argv )
 
 	// Process command line arguments
 	//
-	double fixed_threshold = (double)atof(argv[1]);
-	int threshold_type = atoi(argv[2]) ? cv::THRESH_BINARY : cv::THRESH_BINARY_INV;
-	int adaptive_method = atoi(argv[3]) ? cv::ADAPTIVE_THRESH_MEAN_C
+	double fixed_threshold = (double)atof(100);
+	int threshold_type = atoi(1) ? cv::THRESH_BINARY : cv::THRESH_BINARY_INV;
+	int adaptive_method = atoi(0) ? cv::ADAPTIVE_THRESH_MEAN_C
 	: cv::ADAPTIVE_THRESH_GAUSSIAN_C;
-	int block_size = atoi(argv[4]);
-	double offset = (double)atof(argv[5]);
-	cv::Mat Igray = cv::imread(argv[6], cv::IMREAD_GRAYSCALE);
+	int block_size = atoi(15);
+	double offset = (double)atof(10);
+	cv::Mat Igray = cv::imread("E:/app/julia/Learning-OpenCV-3_examples/faces.jpg", cv::IMREAD_GRAYSCALE);
 
 	// Read in gray image.
 	//

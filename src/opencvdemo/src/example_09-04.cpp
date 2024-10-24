@@ -3,8 +3,14 @@
 //connected to the sliders in Figure 9-6
 // Note: This example needs OpenGL installed on your system. It doesn't build if 
 //       the OpenGL libraries cannot be found.
+#include <windows.h>  //Windows Header
+
 #include <GL/gl.h>
 #include <GL/glu.h>
+
+//#include <GL/glfw.h>
+//#include <GL/glew.h>
+//#include <GL/glm.h>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/opengl.hpp>
@@ -63,7 +69,7 @@ void help(char ** argv) {
 		<< "\n//cube every frame; this modified version uses the global variables rotx and roty that are"
 		<< "\n//connected to the sliders in Figure 9-6"
 		<< "\n// Note: This example needs OpenGL installed on your system. It doesn't build if" 
-		<< "\n//       the OpenGL libraries cannot be found.\n\/"
+		<< "\n//       the OpenGL libraries cannot be found.\n"
 		<< "\nCall: " << argv[0] << " <image>\n\n"
 		<< "\nHere OpenGL is used to render a cube on top of an image.\n"
         << "\nUser can rotate the cube with the sliders\n" <<endl;
@@ -82,7 +88,7 @@ int main(int argc, char* argv[])
         return -1;
     }
 
-    cv::namedWindow( "Example 9-4", CV_WINDOW_OPENGL );
+    cv::namedWindow( "Example 9-4", cv::WINDOW_OPENGL );
     cv::resizeWindow("Example 9-4", img.cols, img.rows);
     cv::createTrackbar( "X-rotation", "Example 9-4", &rotx, 360, on_trackbar);
     cv::createTrackbar( "Y-rotation", "Example 9-4", &roty, 360, on_trackbar);
