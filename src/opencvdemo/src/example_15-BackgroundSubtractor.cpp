@@ -58,17 +58,17 @@ int main(int argc, char* argv[])
     namedWindow("theBackground");
     namedWindow("FG Mask MOG 2");
 
-   	int number_to_train_on = atoi("19"); //Read the number of frames to train on
+   	int number_to_train_on = atoi("50"); //Read the number of frames to train on
 
     //create Background Subtractor objects
     pMOG2 = createBackgroundSubtractorMOG2(); //MOG2 approach
-    /*if(strcmp(argv[2], "-vid") == 0) {
+    /*if(strcmp(argv[2], "-vid") == 0) {*/
         //input data coming from a video
         processVideo("E:/app/julia/Learning-OpenCV-3_examples/tree.avi", number_to_train_on);
-    }
+    /*}
     else if(strcmp(argv[2], "-img") == 0) {*/
         //input data coming from a sequence of images
-        processImages("E:/app/julia/Learning-OpenCV-3_examples/shape_sample/1.png", number_to_train_on);
+        //processImages("E:/app/julia/Learning-OpenCV-3_examples/shape_sample/1.png", number_to_train_on);
     /*}
     else {
         //error in reading input parameters
@@ -111,7 +111,7 @@ void processVideo(string videoFilename, int train) {
         //get the frame number and write it on the current frame
         stringstream ss;
         rectangle(frame, cv::Point(10, 2), cv::Point(100,20),
-                  cv::Scalar(255,255,255), -1);
+        cv::Scalar(255,255,255), -1);
         ss << capture.get(CAP_PROP_POS_FRAMES);
         string frameNumberString = ss.str();
         putText(frame, frameNumberString.c_str(), cv::Point(15, 15),
@@ -131,11 +131,11 @@ void processVideo(string videoFilename, int train) {
 */
         //get the input from the keyboard
         if(frame_count >= train) {
-			cout << "\nHit any key to continue\n" << endl;
-			keyboard = waitKey(); //single step with keyboard press in run mode
-		} else {
-			keyboard = waitKey( 10 ); //run automatically in train mode
-		}
+    			cout << "\nHit any key to continue\n" << endl;
+    			keyboard = waitKey(); //single step with keyboard press in run mode
+    		} else {
+    			keyboard = waitKey( 10 ); //run automatically in train mode
+    		}
     }
     //delete capture object
     capture.release();

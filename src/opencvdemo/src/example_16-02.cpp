@@ -144,6 +144,7 @@ inline void findKeyPointsHomography(vector<KeyPoint>& kpts1, vector<KeyPoint>& k
 }
 
 int main(int argc, char** argv) {
+    cout << cv::getBuildInformation() << std::endl;
     // Program expects at least four arguments:
     //   - descriptors type ("surf", "sift", "orb", "brisk",
     //          "kaze", "akaze", "freak", "daisy", "brief").
@@ -176,8 +177,8 @@ int main(int argc, char** argv) {
         exit(1);
     }*/
 
-    string desc_type("fastfreak");
-    string match_type("bf");
+    string desc_type("sift");
+    string match_type("knn");
 
     string img_file1("E:/app/julia/Learning-OpenCV-3_examples/box.png");
     string img_file2("E:/app/julia/Learning-OpenCV-3_examples/box_in_scene.png");

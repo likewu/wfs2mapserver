@@ -40,24 +40,24 @@ static void onMouseClick(int event, int x, int y, int, void*) {
     }
 
     if (event == cv::EVENT_LBUTTONDOWN && drawr == 0) {
-		if(x_0 < 0) {
-			x_0 = x;
-			y_0 = y;
-			cv::ellipse(markers, cv::Point(x, y), cv::Size(1, 1),
-            0, 0, 360, cv::GC_FGD, 3);
-			cv::ellipse(drawRect, cv::Point(x, y), cv::Size(1, 1),
-            0, 0, 360, cv::Scalar(0, 0, 255), 3);
-            drawr = 1;
-		} 
- 
-        cv::addWeighted(img,0.7,drawRect,0.3, 0, img_preview);
-    
-        cv::imshow("image", img_preview);
-        return;
+  		if(x_0 < 0) {
+  			x_0 = x;
+  			y_0 = y;
+  			cv::ellipse(markers, cv::Point(x, y), cv::Size(1, 1),
+              0, 0, 360, cv::GC_FGD, 3);
+  			cv::ellipse(drawRect, cv::Point(x, y), cv::Size(1, 1),
+              0, 0, 360, cv::Scalar(0, 0, 255), 3);
+        drawr = 1;
+  		} 
+
+      cv::addWeighted(img,0.7,drawRect,0.3, 0, img_preview);
+  
+      cv::imshow("image", img_preview);
+      return;
     }
     if( event == cv::EVENT_LBUTTONUP) {
-		drawr = 2;
-	}
+  	  drawr = 2;
+  	}
     if(drawr == 1) { //Just moving
 			drawRect.setTo(0);
 			cv::rectangle(drawRect, cv::Point(x_0,y_0), cv::Point(x,y), cv::Scalar(0,0,255), -1);
@@ -66,7 +66,7 @@ static void onMouseClick(int event, int x, int y, int, void*) {
 			x_1 = x; y_1 = y;    
 			cv::imshow("image", img_preview);
 			return;
-	}
+	  }
 
     if (drawr == 2) {
         cv::Mat bg;

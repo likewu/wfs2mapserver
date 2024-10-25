@@ -15,3 +15,6 @@ ninja -C build
 
 
 D:\Programs\vcpkg\vcpkg integrate install
+
+
+https://kkgithub.com/thommyho/Cpp-OpenCV-Windows-PreBuilts/releases/tag/v4.9.0

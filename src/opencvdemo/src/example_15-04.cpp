@@ -439,7 +439,7 @@ int main( int argc, char** argv) {
 		cout <<  frame_count++ << " 'a' to adjust threholds" << endl;
 		if(key == 'a') {
 			cout << "Adjusting thresholds" << endl;
-		cout << "y,u,v for channel; l for minMod, h for maxMod threshold; , for down, . for up; esq or q to quit;" << endl;
+		  cout << "y,u,v for channel; l for minMod, h for maxMod threshold; , for down, . for up; esq or q to quit;" << endl;
 			adjustThresholds(seg,image,bgd);
 		}
 		else {
@@ -452,7 +452,3 @@ int main( int argc, char** argv) {
 	}
 	exit(0);
 }
-
-
-
-

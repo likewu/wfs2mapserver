@@ -43,10 +43,10 @@ int main( int argc, char** argv ){
     for( int s = 0; s < histSize[1]; s++ ){
       float hval = hist.at<float>(h, s);
       cv::rectangle(
-	hist_img,
-	cv::Rect(h*scale,s*scale,scale,scale),
-	cv::Scalar::all(hval),
-	-1
+      	hist_img,
+      	cv::Rect(h*scale,s*scale,scale,scale),
+      	cv::Scalar::all(hval),
+      	-1
       );
     }
   }

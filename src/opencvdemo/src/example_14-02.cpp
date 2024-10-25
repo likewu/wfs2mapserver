@@ -13,7 +13,6 @@ struct AreaCmp {
 };
 
 int main(int argc, char* argv[]) {
-
   cv::Mat img, img_edge, img_color;
 
   // load image or show help if no image was provided
@@ -50,7 +49,7 @@ int main(int argc, char* argv[]) {
 
   // sort contours so that the largest contours go first
   //
-  std::sort( sortIdx.begin(), sortIdx.end(), AreaCmp(areas ));
+  std::sort(sortIdx.begin(), sortIdx.end(), AreaCmp(areas));
 
   for( int n = 0; n < (int)sortIdx.size(); n++ ) {
     int idx = sortIdx[n];

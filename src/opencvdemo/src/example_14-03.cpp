@@ -7,7 +7,6 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-
   cv::Mat img, img_edge, labels, centroids, img_color, stats;
 
   // load image or show help if no image was provided
@@ -26,10 +25,10 @@ int main(int argc, char* argv[]) {
   cv::imshow("Image after threshold", img_edge);
 
   int i, nccomps = cv::connectedComponentsWithStats (
-	img_edge, 
-	labels,
-	stats, 
-	centroids
+  	img_edge, 
+  	labels,
+  	stats, 
+  	centroids
   );
   cout << "Total Connected Components Detected: " << nccomps << endl;
 
@@ -38,7 +37,7 @@ int main(int argc, char* argv[]) {
   for( i = 1; i <= nccomps; i++ ) {
     colors[i] = cv::Vec3b(rand()%256, rand()%256, rand()%256);
     if( stats.at<int>(i-1, cv::CC_STAT_AREA) < 100 )
-    colors[i] = cv::Vec3b(0,0,0); // small regions are painted with black too.
+      colors[i] = cv::Vec3b(0,0,0); // small regions are painted with black too.
   }
   img_color = cv::Mat::zeros(img.size(), CV_8UC3);
   for( int y = 0; y < img_color.rows; y++ )

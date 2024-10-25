@@ -99,7 +99,7 @@ void findConnectedComponents(
 	//
 	mask.setTo( 0 );
 	cv::drawContours( mask, contours, -1, CVX_WHITE, cv::FILLED );
-}		
+}
 
 ////////////////////////////////////////////////////////////////////////
 ////////// Use previous example_15-04 and clean up its images //////////
@@ -560,7 +560,3 @@ int main( int argc, char** argv) {
 	}
 	exit(0);
 }
-
-
-
-

@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
   image_sf = atof("0.5");
   int board_n = board_w * board_h;
   cv::Size board_sz = cv::Size(board_w, board_h);
-  cv::VideoCapture capture(0);
+  cv::VideoCapture capture("E:/app/julia/wfs2map/src/opencvvideo/tests/chessboard.avi");
 
   if (!capture.isOpened()) {
     cout << "\nCouldn't open the camera\n";

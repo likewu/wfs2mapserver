@@ -93,13 +93,13 @@ int main( int argc, char** argv ) {
     //
     for( int h = 0; h < hist_size[0]; h++ )
       for( int s = 0; s < hist_size[1]; s++ ) {
-	float hval = hist[i].at<float>(h, s);
-	cv::rectangle(
-	  hist_img[i],
-	  cv::Rect(h*scale, s*scale, scale, scale),
-	  cv::Scalar::all(hval),
-	  -1
-	);
+      	float hval = hist[i].at<float>(h, s);
+      	cv::rectangle(
+      	  hist_img[i],
+      	  cv::Rect(h*scale, s*scale, scale, scale),
+      	  cv::Scalar::all(hval),
+      	  -1
+      	);
       }
   }
 
@@ -140,7 +140,6 @@ int main( int argc, char** argv ) {
   // Oi Vey, parse histograms to earth movers signatures
   //
   for( i=0; i<5; ++i) {
-
     vector<cv::Vec3f> sigv;
 
     // (re)normalize histogram to make the bin weights sum to 1.
@@ -148,9 +147,9 @@ int main( int argc, char** argv ) {
     cv::normalize(hist[i], hist[i], 1, 0, cv::NORM_L1);
     for( int h = 0; h < h_bins; h++ )
       for( int s = 0; s < s_bins; s++ ) {
-	float bin_val = hist[i].at<float>(h, s);
-	if( bin_val != 0 )
-	  sigv.push_back( cv::Vec3f(bin_val, (float)h, (float)s));
+      	float bin_val = hist[i].at<float>(h, s);
+      	if( bin_val != 0 )
+      	  sigv.push_back( cv::Vec3f(bin_val, (float)h, (float)s));
       }
 
     // make Nx3 32fC1 matrix, where N is the number of nonzero histogram bins
@@ -158,9 +157,8 @@ int main( int argc, char** argv ) {
     sig[i] = cv::Mat(sigv).clone().reshape(1);
     if( i > 0 )
       cout << "Hist[0] vs Hist[" << i << "]: "
-	   << EMD(sig[0], sig[i], cv::DIST_L2) << endl;
+	      << EMD(sig[0], sig[i], cv::DIST_L2) << endl;
   }
 
   cv::waitKey(0);
-
 }
