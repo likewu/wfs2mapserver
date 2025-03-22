@@ -15,13 +15,13 @@ export async function createPost(formData: FormData) {
   const content = formData.get('content')
   const email = formData.get('email')
  
-  const validateFields = schema.safeParse({
+  const validatedFields = schema.safeParse({
     email: email,
   })
 
-  if () {
+  if (!validatedFields.success) {
     return {
-      errors: validateFields.error.flatten().fieldErrors,
+      errors: validatedFields.error.flatten().fieldErrors,
     }
   }
 }
