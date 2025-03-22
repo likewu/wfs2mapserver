@@ -157,7 +157,7 @@ const DndPills = ({ pills }: Props) => {
         ))}
       </DraggableSpace>
       <DraggableSpace>
-        {items.filter(item => {item.id%2==0}).map(item => (
+        {items.filter((item, index) => index%2==0).map(item => (
           <Badge
             key={item.id}
             style={{ width: item.calculatedWidth, height: item.calculatedHeight }}
