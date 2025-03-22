@@ -22,9 +22,5 @@ export default function DragLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <div>
-    {children}
-    </div>
-  );
+  return children;
 }

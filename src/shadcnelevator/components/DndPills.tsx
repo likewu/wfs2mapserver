@@ -14,7 +14,7 @@ import {
   DragEndEvent,
 } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable } from '@dnd-kit/sortable';
-import { Pill } from '@/app/page';
+import { Pill } from '@/app/drag/page';
 import { Badge } from '@/components/ui/badge';
 import DraggableSpace from '@/components/DraggableSpace';
 
@@ -24,7 +24,7 @@ interface Props {
 
 const DropLineIndicator = () => <div className="w-0.5 h-6 bg-gray-500 mx-1" />;
 
-const SortablePill = ({ item }: { item: Pill & { calculatedWidth: number } }) => {
+const SortablePill = ({ item }: { item: Pill & { calculatedWidth: number, calculatedHeight: number } }) => {
   const [isMounted, setIsMounted] = useState(false);
   const { attributes, listeners, setNodeRef, isDragging } = useSortable({ id: item.id });
 
@@ -35,7 +35,7 @@ const SortablePill = ({ item }: { item: Pill & { calculatedWidth: number } }) =>
   return (
     <Badge
       ref={setNodeRef}
-      style={{ width: item.calculatedWidth }}
+      style={{ width: item.calculatedWidth, height: item.calculatedHeight }}
       className={`
         px-2 py-1
         rounded-md
@@ -58,7 +58,7 @@ const SortablePill = ({ item }: { item: Pill & { calculatedWidth: number } }) =>
 
 const DndPills = ({ pills }: Props) => {
   const [isMounted, setIsMounted] = useState(false);
-  const [items, setItems] = useState<(Pill & { calculatedWidth: number })[]>([]);
+  const [items, setItems] = useState<(Pill & { calculatedWidth: number, calculatedHeight: number })[]>([]);
   const [activeId, setActiveId] = useState<number | null>(null);
   const [overIndex, setOverIndex] = useState<number | null>(null);
 
@@ -90,7 +90,8 @@ const DndPills = ({ pills }: Props) => {
     // Map original pills to include calculated width
     const itemsWithWidth = pills.map(pill => ({
       ...pill,
-      calculatedWidth: measureTextWidth(pill.text),
+      calculatedWidth: pill.width,//measureTextWidth(pill.text),
+      calculatedHeight: pill.height,
     }));
 
     setItems(itemsWithWidth);
@@ -147,7 +148,7 @@ const DndPills = ({ pills }: Props) => {
         {items.map(item => (
           <Badge
             key={item.id}
-            style={{ width: item.calculatedWidth }}
+            style={{ width: item.calculatedWidth, height: item.calculatedHeight }}
             className="px-2 py-1 rounded-md text-white cursor-grab flex items-center justify-center transition-colors whitespace-nowrap"
           >
             {item.text}
@@ -182,7 +183,7 @@ const DndPills = ({ pills }: Props) => {
       {isMounted && activeId && (
         <DragOverlay>
           <Badge
-            style={{ width: items.find(item => item.id === activeId)?.calculatedWidth }}
+            style={{ width: items.find(item => item.id === activeId)?.calculatedWidth, height: items.find(item => item.id === activeId)?.calculatedHeight }}
             className="px-2 py-1 rounded-md text-white cursor-grab flex items-center justify-center transition-colors whitespace-nowrap"
           >
             {items.find(item => item.id === activeId)?.text}
