@@ -144,6 +144,7 @@ const DndPills = ({ pills }: Props) => {
   // Render static version during SSR and hydration
   if (!isMounted) {
     return (
+      <div>
       <DraggableSpace>
         {items.map(item => (
           <Badge
@@ -155,6 +156,18 @@ const DndPills = ({ pills }: Props) => {
           </Badge>
         ))}
       </DraggableSpace>
+      <DraggableSpace>
+        {items.filter(item => {item.id%2==0}).map(item => (
+          <Badge
+            key={item.id}
+            style={{ width: item.calculatedWidth, height: item.calculatedHeight }}
+            className="px-2 py-1 rounded-md text-white cursor-grab flex items-center justify-center transition-colors whitespace-nowrap"
+          >
+            {item.text}
+          </Badge>
+        ))}
+      </DraggableSpace>
+      </div>
     );
   }
 
@@ -170,6 +183,18 @@ const DndPills = ({ pills }: Props) => {
       <DraggableSpace>
         <SortableContext items={items.map(item => item.id)}>
           {items.map((item, index) => (
+            <React.Fragment key={item.id}>
+              {/* Only show the indicator if it's the first position or after this pill */}
+              {overIndex === index && index === 0 && <DropLineIndicator />}
+              <SortablePill item={item} />
+              {overIndex === index + 1 && activeId !== item.id && <DropLineIndicator />}
+            </React.Fragment>
+          ))}
+        </SortableContext>
+      </DraggableSpace>
+      <DraggableSpace>
+        <SortableContext items={items.map(item => item.id)}>
+          {items.filter((item, index) => index%2==0).map((item, index) => (
             <React.Fragment key={item.id}>
               {/* Only show the indicator if it's the first position or after this pill */}
               {overIndex === index && index === 0 && <DropLineIndicator />}
