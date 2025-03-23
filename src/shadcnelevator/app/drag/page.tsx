@@ -1,8 +1,4 @@
-import Link from 'next/link';
-import ReactPills from '@/components/ReactPills';
 import DndPills from '@/components/DndPills';
-
-import { GithubIcon } from 'lucide-react';
 
 export type Pill = {
   id: number;
