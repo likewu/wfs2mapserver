@@ -23,13 +23,16 @@ const schema = z.object({
   }).min(1, { message: "必填" }),
   weight: z.string({
     required_error: "必填",
+    invalid_type_error: "必填",
   }).min(1, { message: "必填" }),
   width1: z.string({
     required_error: "必填",
-  }).min(1000, { message: "1000-2000之间" }).min(2000, { message: "1000-2000之间" }),
+    invalid_type_error: "必填",
+  }).min(1000, { message: "需要大于1000" }).max(2000, { message: "需要小于2000" }),
   height1: z.string({
     required_error: "必填",
-  }).min(1000, { message: "1000-2000之间" }).max(2000, { message: "1000-2000之间" }),
+    invalid_type_error: "必填",
+  }).min(1000, { message: "需要大于1000" }).max(2000, { message: "需要小于2000" }),
   telzone: z.string({
     required_error: "必填",
     invalid_type_error: "请正确填写区号",
