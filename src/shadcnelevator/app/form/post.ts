@@ -25,14 +25,14 @@ const schema = z.object({
     required_error: "必填",
     invalid_type_error: "必填",
   }).min(1, { message: "必填" }),
-  width1: z.string({
+  width1: z.number({
     required_error: "必填",
-    invalid_type_error: "必填",
-  }).min(1000, { message: "需要大于1000" }).max(2000, { message: "需要小于2000" }),
-  height1: z.string({
+    invalid_type_error: "必需数字",
+  }).gte(1000, { message: "需要大于1000" }).lte(2000, { message: "需要小于2000" }),
+  height1: z.number({
     required_error: "必填",
-    invalid_type_error: "必填",
-  }).min(1000, { message: "需要大于1000" }).max(2000, { message: "需要小于2000" }),
+    invalid_type_error: "必需数字",
+  }).gte(1000, { message: "需要大于1000" }).lte(2000, { message: "需要小于2000" }),
   telzone: z.string({
     required_error: "必填",
     invalid_type_error: "请正确填写区号",
@@ -67,8 +67,8 @@ export async function createPost(prevState: any, formData: FormData) {
     telcode: telcode,
     producttype: producttype,
     weight: weight,
-    width1: width1,
-    height1: height1,
+    width1: Number(width1),
+    height1: Number(height1),
   })
 
   if (!validatedFields.success) {

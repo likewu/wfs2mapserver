@@ -12,17 +12,63 @@ const initialState = {
   errors: '',
 }
 
+const weightArr = [
+  {
+    id: 630,
+    label: "630",
+  },
+  {
+    id: 1000,
+    label: "1000",
+  },
+  {
+    id: 1250,
+    label: "1250",
+  }
+];
+
+const widthArr = [
+  {
+    id: 1100,
+  },
+  {
+    id: 1200,
+  },
+  {
+    id: 1600,
+  }
+];
+
+const heightArr = [
+  {
+    id: 1400,
+  },
+  {
+    id: 2100,
+  }
+];
+
 export default function Page() {
     const [company, setCompany] = useState("")
     const [companyErr, setCompanyErr] = useState("")
+    const [telzone, setTelzone] = useState("")
     const [telzoneErr, setTelzoneErr] = useState("")
+    const [telcode, setTelcode] = useState("")
     const [telcodeErr, setTelcodeErr] = useState("")
+    const [address, setAddress] = useState("")
     const [addressErr, setAddressErr] = useState("")
+    const [dealaddr, setDealaddr] = useState("")
     const [dealaddrErr, setDealaddrErr] = useState("")
+    const [producttype, setProducttype] = useState("")
     const [producttypeErr, setProducttypeErr] = useState("")
+    const [weight, setWeight] = useState(630)
+    const [weight1, setWeight1] = useState(null)
     const [weightErr, setWeightErr] = useState("")
-    const [width, setWidth] = useState(null)
+    const [width, setWidth] = useState(1100)
+    const [width1, setWidth1] = useState(null)
     const [widthErr, setWidthErr] = useState("")
+    const [height, setHeight] = useState(1400)
+    const [height1, setHeight1] = useState(null)
     const [heightErr, setHeightErr] = useState("")
 
     const [isShown, setIsShown] = useState(false)
@@ -55,10 +101,10 @@ export default function Page() {
           <h1 className="text-2xl font-medium">form</h1>
               <form action={formAction}>
                 <Label>公司姓名</Label><Input type="text" name="company" value={company} onChange={(e) => setCompany(e.target.value)} /><label className="text-sm/6 font-medium text-red-900">{companyErr}</label><br/>
-                <Label>电话区号</Label><Input type="text" name="telzone"/><label className="text-sm/6 font-medium text-red-900">{telzoneErr}</label><br/>
-                <Label>电话号码</Label><Input type="text" name="telcode"/><label className="text-sm/6 font-medium text-red-900">{telcodeErr}</label><br/>
-                <Label>公司地址</Label><Input type="text" name="address"/><label className="text-sm/6 font-medium text-red-900">{addressErr}</label><br/>
-                <Label>账单地址</Label><Input type="text" name="dealaddr"/><label className="text-sm/6 font-medium text-red-900">{dealaddrErr}</label><br/>
+                <Label>电话区号</Label><Input type="text" name="telzone" value={telzone} onChange={(e) => setTelzone(e.target.value)} /><label className="text-sm/6 font-medium text-red-900">{telzoneErr}</label><br/>
+                <Label>电话号码</Label><Input type="text" name="telcode" value={telcode} onChange={(e) => setTelcode(e.target.value)} /><label className="text-sm/6 font-medium text-red-900">{telcodeErr}</label><br/>
+                <Label>公司地址</Label><Input type="text" name="address" value={address} onChange={(e) => setAddress(e.target.value)} /><label className="text-sm/6 font-medium text-red-900">{addressErr}</label><br/>
+                <Label>账单地址</Label><Input type="text" name="dealaddr" value={dealaddr} onChange={(e) => setDealaddr(e.target.value)} /><label className="text-sm/6 font-medium text-red-900">{dealaddrErr}</label><br/>
                 <Label>产品类型　　</Label>
                 <Select name="producttype" onValueChange={(e) => handleChange(e)}>
                   <SelectTrigger>
@@ -72,41 +118,47 @@ export default function Page() {
                 </Select><label class="text-sm/6 font-medium text-red-900">{producttypeErr}</label><br/>
                 {isShown && <Fragment>
                 <Label>载重(千克)　　　</Label>
-                <Select name="weight">
+                <Select name="weight" value={weight} onValueChange={(e) => setWeight(Number(e))}>
                   <SelectTrigger>
                     <SelectValue placeholder=""/>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="630">630</SelectItem>
-                    <SelectItem value="1000">1000</SelectItem>
-                    <SelectItem value="1250">1250</SelectItem>
+                    {weightArr.map((w) => (
+                      <SelectItem key={w.id} value={w.id}>
+                        {w.id}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
-                <Input type="text" name="weight1"/><label class="text-sm/6 font-medium text-red-900">{weightErr}</label><br/>
+                <Input type="text" name="weight1" value={weight1} onChange={(e) => setWeight1(e.target.value)} /><label class="text-sm/6 font-medium text-red-900">{weightErr}</label><br/>
                 <Label>轿厢宽度(毫米)</Label>
-                <Select name="width">
+                <Select name="width" value={width} onValueChange={(e) => setWidth(Number(e))}>
                   <SelectTrigger>
                     <SelectValue placeholder=""/>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1100">1100</SelectItem>
-                    <SelectItem value="1200">1200</SelectItem>
-                    <SelectItem value="1600">1600</SelectItem>
+                    {widthArr.filter((w) => (weight==630&&w.id==1100)||(weight==1000&&w.id==1200)||(weight==1250&&(w.id==1200||w.id==1600))).map((w) => (
+                      <SelectItem key={w.id} value={w.id}>
+                        {w.id}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
-                <Input type="text" name="width1" value={width} onChange={(e) => setWidth(e.target.value)} /><label class="text-sm/6 font-medium text-red-900">{widthErr}</label><br/>
+                <Input type="text" name="width1" value={width1} onChange={(e) => setWidth1(e.target.value)} /><label class="text-sm/6 font-medium text-red-900">{widthErr}</label><br/>
                 <Label>轿厢深度(毫米)</Label>
-                <Select name="height">
+                <Select name="height" value={height} onValueChange={(e) => setHeight(Number(e))}>
                   <SelectTrigger>
                     <SelectValue placeholder=""/>
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="1400">1400</SelectItem>
-                    <SelectItem value="2100">2100</SelectItem>
-                    <SelectItem value="1600">1600</SelectItem>
+                    {heightArr.filter((h) => (weight==630&&h.id==1400)||(weight==1000&&h.id==2100)||(weight==1250&&width==1200&&h.id==2100)||(weight==1250&&width==1600&&h.id==1400)).map((h) => (
+                      <SelectItem key={h.id} value={h.id}>
+                        {h.id}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
-                <Input type="text" name="height1"/><label class="text-sm/6 font-medium text-red-900">{heightErr}</label><br/>
+                <Input type="text" name="height1" value={height1} onChange={(e) => setHeight1(e.target.value)} /><label class="text-sm/6 font-medium text-red-900">{heightErr}</label><br/>
                 </Fragment>}
                 <div class="mt-6 flex items-center justify-end gap-x-6">
                 <Button type="submit">提交</Button>
