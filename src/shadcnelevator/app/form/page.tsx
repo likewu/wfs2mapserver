@@ -2,9 +2,18 @@
 
 import { useState, useEffect, useActionState } from 'react'
 import { createPost } from '@/app/form/post'
- 
+
+import { Button } from "@/components/ui/button"
+
 const initialState = {
   errors: '',
+}
+
+const handleChange = (e) => {
+  if (e.target.value==1) {
+    setClass1("none")
+  } else
+    setClass1("")
 }
 
 export default function Page() {
@@ -18,6 +27,8 @@ export default function Page() {
     const [weightErr, setWeightErr] = useState("")
     const [widthErr, setWidthErr] = useState("")
     const [heightErr, setHeightErr] = useState("")
+
+    const [class1, setClass1] = useState("")
 
     const [state, formAction, pending] = useActionState(createPost, initialState)
     useEffect(() => {
@@ -44,18 +55,34 @@ export default function Page() {
                 <label class="text-sm/6 font-medium text-gray-900">电话号码</label><input type="text" name="telcode" class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" /><label class="text-sm/6 font-medium text-red-900">{telcodeErr}</label><br/>
                 <label class="text-sm/6 font-medium text-gray-900">公司地址</label><input type="text" name="address" class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" /><label class="text-sm/6 font-medium text-red-900">{addressErr}</label><br/>
                 <label class="text-sm/6 font-medium text-gray-900">账单地址</label><input type="text" name="dealaddr" class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" /><label class="text-sm/6 font-medium text-red-900">{dealaddrErr}</label><br/>
-                <label class="text-sm/6 font-medium text-gray-900">产品类型　　</label><select name="producttype" class="px-4 py-3 rounded-full">
+                <label class="text-sm/6 font-medium text-gray-900">产品类型　　</label>
+                <select name="producttype" onChange={(e) => handleChange(e)} class="px-4 py-3 rounded-full">
                   <option value="1">客梯</option>
                   <option value="2">自动扶梯</option>
                   <option value="3">自动人行道</option>
                 </select><label class="text-sm/6 font-medium text-red-900">{producttypeErr}</label><br/>
-                <label class="text-sm/6 font-medium text-gray-900">载重(千克)　　　</label><select name="weight">
-                  <option value="1">630</option>
-                  <option value="2">1000</option>
-                  <option value="3">1250</option>
-                </select><label class="text-sm/6 font-medium text-red-900">{weightErr}</label><br/>
-                <label class="text-sm/6 font-medium text-gray-900">轿厢宽度(毫米)</label><input type="text" name="width" class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" /><label class="text-sm/6 font-medium text-red-900">{widthErr}</label><br/>
-                <label class="text-sm/6 font-medium text-gray-900">轿厢深度(毫米)</label><input type="text" name="height" class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" /><label class="text-sm/6 font-medium text-red-900">{heightErr}</label><br/>
+                <dev class={class1}><label class="text-sm/6 font-medium text-gray-900">载重(千克)　　　</label><select name="weight">
+                  <option value="630">630</option>
+                  <option value="1000">1000</option>
+                  <option value="1250">1250</option>
+                </select>
+                <input type="text" name="weight1" class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" />
+                <label class="text-sm/6 font-medium text-red-900">{weightErr}</label><br/>
+                <label class="text-sm/6 font-medium text-gray-900">轿厢宽度(毫米)</label>
+                <select name="width">
+                  <option value="1100">1100</option>
+                  <option value="1200">1200</option>
+                  <option value="1600">1600</option>
+                </select>
+                <input type="text" name="width1" class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" /><label class="text-sm/6 font-medium text-red-900">{widthErr}</label><br/>
+                <label class="text-sm/6 font-medium text-gray-900">轿厢深度(毫米)</label>
+                <select name="height">
+                  <option value="1">1400</option>
+                  <option value="2">2100</option>
+                  <option value="3">1600</option>
+                </select>
+                <input type="text" name="height1" class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6" /><label class="text-sm/6 font-medium text-red-900">{heightErr}</label><br/>
+                </div>
                 <div class="mt-6 flex items-center justify-end gap-x-6">
                 <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">提交</button>
                 </div>

@@ -24,12 +24,12 @@ const schema = z.object({
   weight: z.string({
     required_error: "必填",
   }).min(1, { message: "必填" }),
-  width: z.string({
+  width1: z.string({
     required_error: "必填",
-  }).min(1, { message: "必填" }),
-  height: z.string({
+  }).min(1000, { message: "1000-2000之间" }).min(2000, { message: "1000-2000之间" }),
+  height1: z.string({
     required_error: "必填",
-  }).min(1, { message: "必填" }),
+  }).min(1000, { message: "1000-2000之间" }).max(2000, { message: "1000-2000之间" }),
   telzone: z.string({
     required_error: "必填",
     invalid_type_error: "请正确填写区号",
@@ -48,8 +48,11 @@ export async function createPost(prevState: any, formData: FormData) {
   const dealaddr = formData.get('dealaddr')
   const producttype = formData.get('producttype')
   const weight = formData.get('weight')
+  const weight1 = formData.get('weight1')
   const width = formData.get('width')
+  const width1 = formData.get('width1')
   const height = formData.get('height')
+  const height1 = formData.get('height1')
   console.log('DD',company,'FF')
  
   const validatedFields = schema.safeParse({
@@ -61,8 +64,8 @@ export async function createPost(prevState: any, formData: FormData) {
     telcode: telcode,
     producttype: producttype,
     weight: weight,
-    width: width,
-    height: height,
+    width1: width1,
+    height1: height1,
   })
 
   if (!validatedFields.success) {
