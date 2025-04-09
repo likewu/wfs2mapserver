@@ -6,6 +6,13 @@ RUSTFLAGS="-Clink-arg=-L -Clink-arg=/mnt/data/app/opt/lib" cargo build
 LD_LIBRARY_PATH=/mnt/data/app/opt/lib /mnt/data/app/julia/wfs2map/target/debug/mapserver
 
 
+ulimit -c unlimited
+sudo bash -c 'echo "/var/corefile/%e-%s.core" > /proc/sys/kernel/core_pattern'
+sudo mkdir /var/corefile
+sudo chmod a+w /var/corefile
+gdb ./target/debug/rustfs /var/corefile/rustfs-6.core
+
+
 #D:\nodejs-nvm\v14.19.1\node E:\app\nodejs\demo\geotiffinfo.js
 #http://192.168.1.11:3000/map/2019/1/100/30
 
