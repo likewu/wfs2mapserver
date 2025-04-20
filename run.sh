@@ -13,6 +13,21 @@ sudo chmod a+w /var/corefile
 gdb ./target/debug/rustfs /var/corefile/rustfs-6.core
 
 
+/mnt/data/app/LLVM-20.1.3-Linux-X64/bin/lldb-server platform --server --listen "*:1234"
+(lldb) platform select remote-linux
+(lldb) platform connect connect://192.168.1.11:1234
+(lldb) file ./target/debug/rustfs
+(lldb) platform settings -w /mnt/data/app/julia/s3-rustfs
+(lldb) platform status
+(lldb) b ecstore/src/tier/tier.rs:379
+(lldb) breakpoint list
+(lldb) run
+(lldb) next
+(lldb) frame variable
+(lldb) print data
+(lldb) expression 1+1
+
+
 #D:\nodejs-nvm\v14.19.1\node E:\app\nodejs\demo\geotiffinfo.js
 #http://192.168.1.11:3000/map/2019/1/100/30
 

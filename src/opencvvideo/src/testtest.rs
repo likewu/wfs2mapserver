@@ -173,3 +173,36 @@ enum Foo {
     },
     Qux(i32),
 }
+
+struct A {
+    i: i32,
+}
+
+impl Default for A {
+    fn default() -> Self {
+        println!("called A::default()");
+        A { i: 42 }
+    }
+}
+
+#[derive(Default)]
+struct B {
+    a: A,
+    i: i32,
+}
+
+impl B {
+    fn new(a: A) -> Self {
+        B {
+            a,
+            // A::default() is called in B::default(), even though "a" is provided here.
+            ..Default::default()
+        }
+    }
+}
+
+fn main() {
+    let a = A { i: 1 };
+    let b = B::new(a);
+    println!("{}", b.a.i);
+}
