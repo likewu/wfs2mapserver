@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Form',
+  title: 'three.js',
   description: 'Drag',
 };
 

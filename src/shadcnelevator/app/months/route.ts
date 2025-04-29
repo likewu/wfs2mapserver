@@ -8,11 +8,11 @@ export async function GET(request: NextRequest) {
   const from = searchParams.get('from')
   const to = searchParams.get('to')
 
-  const zone = caculateTimeZone(lon)
-  const year1 = Number(from.substring(0, 4))
-  const month1 = Number(from.substring(5, 7))
-  const year2 = Number(to.substring(0, 4))
-  const month2 = Number(to.substring(5, 7))
+  const zone = caculateTimeZone(Number(lon))
+  const year1 = Number(from?.substring(0, 4))
+  const month1 = Number(from?.substring(5, 7))
+  const year2 = Number(to?.substring(0, 4))
+  const month2 = Number(to?.substring(5, 7))
   const moment1 = moment(new Date(year1, month1-2, 1))
   const moment2 = moment(new Date(year2, month2-1, 1))
   let months = moment2.diff(moment1, 'months');
