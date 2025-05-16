@@ -105,5 +105,5 @@ include_directories( E:/app/julia/wfs2map/target/debug/build/opencvvideo-0bfbea1
 message(STATUS "OpenCV_CUDA: ${OpenCV_CUDA}")
 
 message(STATUS "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-add_library( example_13-01 src/opencv.cc )
+add_executable( example_13-01 src/opencv.cc E:/app/julia/wfs2map/target/cxxbridge/opencvvideo/examples/example_13-01.rs.cc 272eb6bee5b5204b-example_13-01.rs.o )
 target_link_libraries( example_13-01 ${OpenCV_LIBS} )
