@@ -1,20 +1,23 @@
 # opencvvideo
 
-$env.LIBCLANG_PATH = F:\clang+llvm-18.1.6-x86_64-pc-windows-msvc\bin\libclang.dll
-$env.Path = ($env.Path | prepend 'F:\clang+llvm-18.1.6-x86_64-pc-windows-msvc\bin' | prepend 'D:\Programs\opencv\build\x64\vc16\bin' | prepend 'D:\Programs\opencv\build\bin')
+$env.LIBCLANG_PATH = F:\clang+llvm-20.1.3-x86_64-pc-windows-msvc\bin\libclang.dll
+$env.Path = ($env.Path | prepend 'F:\clang+llvm-20.1.3-x86_64-pc-windows-msvc\bin' | prepend 'D:\Programs\opencv\build\x64\vc16\bin' | prepend 'D:\Programs\opencv\build\bin')
 $env.OPENCV_LINK_LIBS = opencv_world490
 $env.OPENCV_LINK_PATHS = D:\Programs\opencv\build\x64\vc16\lib
 $env.OPENCV_INCLUDE_PATHS = D:\Programs\opencv\build\include
 
 vs 2022:
-$env:LIBCLANG_PATH = "F:\clang+llvm-18.1.6-x86_64-pc-windows-msvc\bin\libclang.dll"
-$env:PATH += ";F:\clang+llvm-18.1.6-x86_64-pc-windows-msvc\bin;D:\Programs\opencv\build\x64\vc16\bin;D:\Programs\opencv\build\bin"
+$env:VCPKG_ROOT = "D:/Programs/vcpkg"
+$env:LIBCLANG_PATH = "F:\clang+llvm-20.1.3-x86_64-pc-windows-msvc\bin\libclang.dll"
+$env:PATH += ";F:\clang+llvm-20.1.3-x86_64-pc-windows-msvc\bin;D:\Programs\opencv\Debug\bin;D:\Programs\oneAPI\tbb\2021.13\bin"
+$env:OpenCV_DIR = "D:\Programs\opencv\Debug"
 $env:OPENCV_LINK_LIBS = "opencv_world490"
 $env:OPENCV_LINK_PATHS = "D:\Programs\opencv\build\x64\vc16\lib"
 $env:OPENCV_INCLUDE_PATHS = "D:\Programs\opencv\build\include"
 
 cargo test -p opencvvideo orb
 cargo run -p opencvvideo --example orb
+cargo run -p opencvvideo --example example_13-01
 lldb-server gdbserver *:1234 ./target/debug/examples/dense_mapping.exe
 //*
 
