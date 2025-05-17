@@ -3,6 +3,8 @@ name = "opencvvideo"
 version = "1.0.0"
 edition = "2021"
 
+links = "opencv_world490"
+
 [[bin]]
 name = "qr"
 path = "src/bin/qr.rs"

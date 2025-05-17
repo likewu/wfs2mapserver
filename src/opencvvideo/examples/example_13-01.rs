@@ -69,8 +69,8 @@ fn main() -> Result<()> {
   let metadata = client.metadata(blobid);
   println!("tags = {:?}", metadata.tags);
 
-  //let ret = client.maincv(1, vec![""]);
-  //println!("ret = {}", ret);
+  let ret = client.maincv(1, vec!["example_13-01", "E:/app/julia/Learning-OpenCV-3_examples/fruits.jpg"]);
+  println!("ret = {}", ret);
 
   Ok(())
 }
@@ -101,7 +101,7 @@ mod ffi {
         fn tag(&self, blobid: u64, tag: &str);
         fn metadata(&self, blobid: u64) -> BlobMetadata;
 
-        //fn maincv(&self, argc: u64, argv: Vec<String>) -> BlobMetadata;
+        fn maincv(&self, argc: u64, argv: Vec<&str>) -> u64;
     }
 }
 

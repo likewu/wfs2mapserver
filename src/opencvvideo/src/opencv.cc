@@ -63,14 +63,14 @@ BlobMetadata OpencvClient::metadata(uint64_t blobid) const {
   return metadata;
 }
 
-int OpencvClient::maincv(int argc, rust::Vec<rust::Str> argv) {
+uint64_t OpencvClient::maincv(uint64_t argc, rust::Vec<rust::Str> argv) const {
   /*if(argc != 2) {
     cout << "\n// Example 13-1. Histogram computation and display" << endl;
     cout << "\nComputer Color Histogram\nUsage: " <<argv[0] <<" <imagename>\n" << endl;
     return -1;
   }*/
 
-  cv::Mat src = cv::imread( "E:/app/julia/Learning-OpenCV-3_examples/fruits.jpg",1 );
+  cv::Mat src = cv::imread("E:/app/julia/Learning-OpenCV-3_examples/fruits.jpg"/*argv[1]*/, 1);
   if( src.empty() ) { cout << "Cannot load " << argv[1] << endl; return -1; }
 
   // Compute the HSV image, and decompose it into separate planes.

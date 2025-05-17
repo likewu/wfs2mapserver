@@ -15,7 +15,7 @@ public:
   void tag(uint64_t blobid, rust::Str tag) const;
   BlobMetadata metadata(uint64_t blobid) const;
 
-  int maincv(int argc, rust::Vec<rust::Str> argv);
+  uint64_t maincv(uint64_t argc, rust::Vec<rust::Str> argv) const;
 
 private:
   class impl;
