@@ -8,7 +8,7 @@ use opencv::{highgui, core, imgcodecs, imgproc, objdetect, features2d, prelude::
 };
 
 fn main() -> Result<()> {
-  let img_1_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/HandIndoorColor.jpg");
+  let img_1_path = Path::new("E:/app/julia/wfs2map/src/opencvvideo/tests/HandIndoorColor.jpg");
   let src = imgcodecs::imread(img_1_path.to_str().unwrap(), imgcodecs::IMREAD_COLOR)?;
   let mut hsv = Mat::default();
   imgproc::cvt_color(&src, &mut hsv, imgproc::COLOR_BGR2HSV, 0);
@@ -30,20 +30,19 @@ fn main() -> Result<()> {
   core::normalize(&hist.clone(), &mut hist, 0., 255., core::NORM_MINMAX, -1, &core::no_array());
   println!("hist matrix dims: {:?} channels: {:?} depth: {:?}", hist.dims(), hist.channels(), hist.depth());
 
-  let scale = 10;
+  /*let scale = 10;
   let mut hist_img=unsafe{Mat::new_rows_cols(histSize.get(0).unwrap()*scale, histSize.get(1).unwrap()*scale, core::CV_8UC3).unwrap()};
 
   // Draw our histogram.
-  //
   for h in 0..histSize.get(0).unwrap() {
     for s in 0..histSize.get(1).unwrap() {
       let hval = hist.at_2d::<u8>(h, s).unwrap();
       imgproc::rectangle(
-  &mut hist_img,
-  core::Rect{x:h*scale, y:s*scale, width:scale, height:scale},
-  core::Scalar::all((*hval).into()),
-  -1,
-  imgproc::LINE_8, 0
+        &mut hist_img,
+        core::Rect{x:h*scale, y:s*scale, width:scale, height:scale},
+        core::Scalar::all((*hval).into()),
+        -1,
+        imgproc::LINE_8, 0
       );
     }
   }
@@ -51,7 +50,7 @@ fn main() -> Result<()> {
   highgui::imshow("image", &src);
   highgui::imshow("H-S histogram", &hist_img);
 
-  highgui::wait_key(0)?;
+  highgui::wait_key(0)?;*/
 
 
   let client = ffi::new_blobstore_client();
@@ -60,6 +59,7 @@ fn main() -> Result<()> {
   let chunks = vec![b"fearless".to_vec(), b"concurrency".to_vec()];
   let mut buf = MultiBuf { chunks, pos: 0 };
   let blobid = client.put(&mut buf);
+  print!("\n\n");
   println!("blobid = {blobid}");
 
   // Add a tag.
