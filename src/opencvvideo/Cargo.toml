@@ -3,7 +3,7 @@ name = "opencvvideo"
 version = "1.0.0"
 edition = "2021"
 
-links = "opencv_world490"
+links = "opencv_world490,opencv_core490,opencv_highgui490,opencv_imgproc490"
 
 [[bin]]
 name = "qr"
@@ -43,7 +43,7 @@ serde_regex = { version = "1.1", optional = true }
 #sophus = "0.14.0"
 
 nalgebra = "0.32.5"
-ceres-solver = { version = "0.3.0", features = ["source"] }
+#ceres-solver = { version = "0.3.0", features = ["source"] }
 
 rand = "0.8.5"
 pdqselect = "0.1.1"

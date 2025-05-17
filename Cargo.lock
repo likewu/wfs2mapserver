@@ -976,38 +976,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "ceres-solver"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c2449161c41ba9cf1a0dfbe6872791b18773eccb49aed955bacc428586e6d68"
-dependencies = [
- "ceres-solver-sys",
- "thiserror 1.0.64",
-]
-
-[[package]]
-name = "ceres-solver-src"
-version = "0.3.0+ceres2.2.0-eigen3.4.0-glog0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "76376047ff62d48cf512542c13d493e9de864f423cdfb8c520c65b5c3aa08254"
-dependencies = [
- "cmake",
-]
-
-[[package]]
-name = "ceres-solver-sys"
-version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "008660c86b585606f5194afcd4336125d76f221aaba5aa560bfb79a6b24ec011"
-dependencies = [
- "ceres-solver-src",
- "cmake",
- "cxx",
- "cxx-build",
- "pkg-config",
-]
-
-[[package]]
 name = "cesu8"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4365,7 +4333,6 @@ dependencies = [
 name = "opencvvideo"
 version = "1.0.0"
 dependencies = [
- "ceres-solver",
  "curl",
  "cxx",
  "cxx-build",

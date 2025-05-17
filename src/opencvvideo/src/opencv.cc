@@ -70,11 +70,12 @@ uint64_t OpencvClient::maincv(uint64_t argc, rust::Vec<rust::Str> argv) const {
     return -1;
   }*/
 
-  cv::Mat src = cv::imread("E:/app/julia/Learning-OpenCV-3_examples/fruits.jpg"/*argv[1]*/, 1);
-  if( src.empty() ) { cout << "Cannot load " << argv[1] << endl; return -1; }
+  string argv_1 = string(argv[1]);
+
+  cv::Mat src = cv::imread(argv_1, 1);
+  if( src.empty() ) { cout << "Cannot load " << argv_1 << endl; return -1; }
 
   // Compute the HSV image, and decompose it into separate planes.
-  //
   cv::Mat hsv;
   cv::cvtColor(src, hsv, cv::COLOR_BGR2HSV);
 
@@ -86,7 +87,6 @@ uint64_t OpencvClient::maincv(uint64_t argc, rust::Vec<rust::Str> argv) const {
   cv::Mat hist;
 
   // Compute the histogram
-  //
   cout << "\nhsv matrix dims: " << hsv.dims << " channels: " << hsv.channels() << " depth: " << hsv.depth() << endl;
   cv::calcHist(&hsv, 1, ch, cv::noArray(), hist, 2, histSize, ranges, true);
   cout << "\nhist matrix dims: " << hist.dims << " channels: " << hist.channels() <<  " depth: " << hist.depth() << endl;
@@ -96,7 +96,6 @@ uint64_t OpencvClient::maincv(uint64_t argc, rust::Vec<rust::Str> argv) const {
   cv::Mat hist_img(histSize[0]*scale, histSize[1]*scale, CV_8UC3);
 
   // Draw our histogram.
-  //
   for( int h = 0; h < histSize[0]; h++ ) {
     for( int s = 0; s < histSize[1]; s++ ){
       float hval = hist.at<float>(h, s);
@@ -112,6 +111,7 @@ uint64_t OpencvClient::maincv(uint64_t argc, rust::Vec<rust::Str> argv) const {
   cv::imshow("image", src);
   cv::imshow("H-S histogram", hist_img);
   cv::waitKey();
+
   return 0;
 }
 

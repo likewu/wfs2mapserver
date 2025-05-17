@@ -75,6 +75,8 @@ fn main() -> Result<()> {
   Ok(())
 }
 
+use cxx::let_cxx_string;
+
 #[cxx::bridge(namespace = "org::opencv")]
 mod ffi {
     // Shared structs with fields visible to both languages.
