@@ -1,5 +1,8 @@
 [workspace]
-members = ["src/mapserver", "src/JWKS-Server", "src/opencvvideo", "src/energy-monitor-tauri/src-tauri"]
+members = [
+  "src/mapserver", "src/JWKS-Server", "src/opencvvideo",
+  "src/energy-monitor-tauri/src-tauri", "src/lvgldemo"
+]
 default-members = ["src/mapserver"]
 resolver = "2"
 

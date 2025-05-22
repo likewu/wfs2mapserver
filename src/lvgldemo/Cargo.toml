@@ -1,30 +1,14 @@
 [package]
-name = "opencvvideo"
+name = "lvgldemo"
 version = "1.0.0"
 edition = "2021"
 
-links = "opencv_world490,opencv_core490,opencv_highgui490,opencv_imgproc490"
-
-[[bin]]
-name = "qr"
-path = "src/bin/qr.rs"
-
-[[bin]]
-name = "video_facedetect"
-path = "src/bin/video_facedetect.rs"
-
-[[bin]]
-name = "crud"
-path = "src/crud.rs"
-
-[features]
-blas = ["ndarray-linalg", "linfa/ndarray-linalg"]
-serde = ["serde_crate", "ndarray/serde", "serde_regex"]
+#links = ""
 
 [dependencies]
 lazy_static = "1.5.0"
 
-opencv = "0.94.4"
+lvgl = "0.6.2"
 cxx = "1.0"
 
 linfa = { version = "0.7.0" }
@@ -43,7 +27,7 @@ serde_regex = { version = "1.1", optional = true }
 #sophus = "0.14.0"
 
 nalgebra = "0.32.5"
-ceres-solver = { version = "0.4.0", features = ["source"] }
+#ceres-solver = { version = "0.4.0", features = ["source"] }
 
 rand = "0.8.5"
 pdqselect = "0.1.1"

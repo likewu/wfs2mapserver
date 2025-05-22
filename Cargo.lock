@@ -3,6 +3,16 @@
 version = 3
 
 [[package]]
+name = "Inflector"
+version = "0.11.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fe438c63458706e03479442743baae6c88256498e6431708f6dfc520a26515d3"
+dependencies = [
+ "lazy_static",
+ "regex",
+]
+
+[[package]]
 name = "JWKS-Server"
 version = "1.0.0"
 dependencies = [
@@ -619,6 +629,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "605877320e5ef98ba6bf000eeae03065557b0631d645c08ad6e84340d388948f"
 
 [[package]]
+name = "az"
+version = "1.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7b7e4c2464d97fe331d41de9d5db0def0a96f4d823b8b32a2efd503578988973"
+
+[[package]]
 name = "backtrace"
 version = "0.3.74"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -678,7 +694,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0f8523b410d7187a43085e7e064416ea32ded16bd0a4e6fc025e21616d01258f"
 dependencies = [
  "bitflags 1.3.2",
- "cexpr",
+ "cexpr 0.4.0",
  "clang-sys",
  "clap 2.34.0",
  "env_logger 0.8.4",
@@ -691,7 +707,29 @@ dependencies = [
  "regex",
  "rustc-hash",
  "shlex",
- "which",
+ "which 3.1.1",
+]
+
+[[package]]
+name = "bindgen"
+version = "0.64.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c4243e6031260db77ede97ad86c27e501d646a27ab57b59a574f725d98ab1fb4"
+dependencies = [
+ "bitflags 1.3.2",
+ "cexpr 0.6.0",
+ "clang-sys",
+ "lazy_static",
+ "lazycell",
+ "log",
+ "peeking_take_while",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "rustc-hash",
+ "shlex",
+ "syn 1.0.109",
+ "which 4.4.2",
 ]
 
 [[package]]
@@ -976,6 +1014,38 @@ dependencies = [
 ]
 
 [[package]]
+name = "ceres-solver"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9ad52409ec4625c20936f155c79610f396bfd53f4e53d1c80737d87f8ade9581"
+dependencies = [
+ "ceres-solver-sys",
+ "thiserror 1.0.64",
+]
+
+[[package]]
+name = "ceres-solver-src"
+version = "0.4.0+ceres2.2.0-eigen3.4.0-glog0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e87e2ece3d4c3a0e28d16bfeb30303780830d1fa611c31dfeae4ab3dcec4a67e"
+dependencies = [
+ "cmake",
+]
+
+[[package]]
+name = "ceres-solver-sys"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0abd03c57e0117d70adb5baa42732172cc10f23818d8848045fae200279af2e9"
+dependencies = [
+ "ceres-solver-src",
+ "cmake",
+ "cxx",
+ "cxx-build",
+ "pkg-config",
+]
+
+[[package]]
 name = "cesu8"
 version = "1.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -987,7 +1057,16 @@ version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f4aedb84272dbe89af497cf81375129abda4fc0a9e7c5d317498c15cc30c0d27"
 dependencies = [
- "nom",
+ "nom 5.1.3",
+]
+
+[[package]]
+name = "cexpr"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6fac387a98bb7c37292057cffc56d62ecb629900026402633ae9160df93a8766"
+dependencies = [
+ "nom 7.1.3",
 ]
 
 [[package]]
@@ -1421,6 +1500,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "cstr_core"
+version = "0.2.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "dd98742e4fdca832d40cab219dc2e3048de17d873248f83f17df47c1bea70956"
+dependencies = [
+ "cty",
+ "memchr",
+]
+
+[[package]]
 name = "csv"
 version = "1.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1450,6 +1539,12 @@ dependencies = [
  "quote",
  "syn 2.0.101",
 ]
+
+[[package]]
+name = "cty"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b365fabc795046672053e29c954733ec3b05e4be654ab130fe8f1f94d7051f35"
 
 [[package]]
 name = "curl"
@@ -1746,6 +1841,29 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4ef6b89e5b37196644d8796de5268852ff179b44e96276cf4290264843743bb7"
 
 [[package]]
+name = "embedded-graphics"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "750082c65094fbcc4baf9ba31583ce9a8bb7f52cadfb96f6164b1bc7f922f32b"
+dependencies = [
+ "az",
+ "byteorder",
+ "embedded-graphics-core",
+ "float-cmp",
+ "micromath",
+]
+
+[[package]]
+name = "embedded-graphics-core"
+version = "0.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b8b1239db5f3eeb7e33e35bd10bd014e7b2537b17e071f726a09351431337cfa"
+dependencies = [
+ "az",
+ "byteorder",
+]
+
+[[package]]
 name = "encoding"
 version = "0.2.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1986,6 +2104,15 @@ checksum = "324a1be68054ef05ad64b861cc9eaf1d623d2d8cb25b4bf2cb9cdd902b4bf253"
 dependencies = [
  "crc32fast",
  "miniz_oxide",
+]
+
+[[package]]
+name = "float-cmp"
+version = "0.8.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e1267f4ac4f343772758f7b1bdcbe767c218bbab93bb432acbf5162bbf85a6c4"
+dependencies = [
+ "num-traits",
 ]
 
 [[package]]
@@ -2607,6 +2734,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c49c37c09c17a53d937dfbb742eb3a961d65a994e6bcdcf37e7399d0cc8ab5e"
 dependencies = [
  "digest",
+]
+
+[[package]]
+name = "home"
+version = "0.5.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "589533453244b0995c858700322199b2becb13b627df2851f64a2775d024abcf"
+dependencies = [
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -3475,6 +3611,89 @@ dependencies = [
 ]
 
 [[package]]
+name = "lvgl"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4f776d0be8bf42bd0f2c76c849e7940cfbf8db60ce057509b39a4d4d2e21c0c6"
+dependencies = [
+ "bitflags 1.3.2",
+ "cstr_core",
+ "ctor",
+ "cty",
+ "embedded-graphics",
+ "lvgl-codegen",
+ "lvgl-sys",
+ "paste",
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
+name = "lvgl-codegen"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "13e05992abb170432f359105e66c25f553fd31b6a42fccf4ea8df4511f8dfa97"
+dependencies = [
+ "Inflector",
+ "lazy_static",
+ "proc-macro2",
+ "quote",
+ "regex",
+ "syn 1.0.109",
+]
+
+[[package]]
+name = "lvgl-sys"
+version = "0.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d697d889a2fd6bdfd350843cb9c9d8dc5b6a33f4eb8962a42f205e147a4643c2"
+dependencies = [
+ "bindgen 0.64.0",
+ "cc",
+ "cty",
+]
+
+[[package]]
+name = "lvgldemo"
+version = "1.0.0"
+dependencies = [
+ "curl",
+ "cxx",
+ "cxx-build",
+ "encoding",
+ "fast_log",
+ "flate2",
+ "jemalloc-ctl",
+ "jemalloc-sys",
+ "jemallocator",
+ "lazy_static",
+ "linfa",
+ "linfa-bayes",
+ "linfa-datasets",
+ "linfa-linalg 0.2.1",
+ "linfa-preprocessing",
+ "log",
+ "lvgl",
+ "nalgebra",
+ "ndarray 0.16.1",
+ "ndarray-linalg 0.17.0",
+ "ndarray-rand 0.15.0",
+ "ndarray-stats 0.6.0",
+ "pdqselect",
+ "rand 0.8.5",
+ "rbatis",
+ "rbdc-pg",
+ "rbs",
+ "regex",
+ "serde",
+ "serde_json",
+ "serde_regex",
+ "tar",
+ "thiserror 2.0.12",
+ "tokio",
+]
+
+[[package]]
 name = "mac"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3520,7 +3739,7 @@ dependencies = [
 name = "mapserver-sys"
 version = "1.0.0"
 dependencies = [
- "bindgen",
+ "bindgen 0.58.1",
  "cmake",
  "fs_extra",
  "libc",
@@ -3597,6 +3816,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "micromath"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bc4010833aea396656c2f91ee704d51a6f1329ec2ab56ffd00bfd56f7481ea94"
+
+[[package]]
 name = "mime"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3611,6 +3836,12 @@ dependencies = [
  "mime",
  "unicase",
 ]
+
+[[package]]
+name = "minimal-lexical"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "68354c5c6bd36d73ff3feceb05efa59b6acb7626617f4962be322a825e61f79a"
 
 [[package]]
 name = "miniz_oxide"
@@ -3899,6 +4130,16 @@ checksum = "08959a387a676302eebf4ddbcbc611da04285579f76f88ee0506c63b1a61dd4b"
 dependencies = [
  "memchr",
  "version_check",
+]
+
+[[package]]
+name = "nom"
+version = "7.1.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d273983c5a657a70a3e8f2a01329822f3b8c8172b73826411a55751e404a0a4a"
+dependencies = [
+ "memchr",
+ "minimal-lexical",
 ]
 
 [[package]]
@@ -4333,6 +4574,7 @@ dependencies = [
 name = "opencvvideo"
 version = "1.0.0"
 dependencies = [
+ "ceres-solver",
  "curl",
  "cxx",
  "cxx-build",
@@ -7553,6 +7795,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d011071ae14a2f6671d0b74080ae0cd8ebf3a6f8c9589a2cd45f23126fe29724"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "which"
+version = "4.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "87ba24419a2078cd2b0f2ede2691b6c66d8e47836da3b6db8265ebad47afbfc7"
+dependencies = [
+ "either",
+ "home",
+ "once_cell",
+ "rustix",
 ]
 
 [[package]]
