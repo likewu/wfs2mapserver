@@ -45,11 +45,11 @@ fn main() -> Result<(), LvError> {
 
     let mut screen_style = Style::default();
     screen_style.set_bg_color(Color::from_rgb((0, 0, 0)));
-    screen.add_style(Part::Main, &mut screen_style);
+    screen.add_style(Part::Main, &mut screen_style)?;
     // Create the button
     let mut button = Btn::create(&mut screen)?;
-    button.set_align(Align::LeftMid, 30, 0);
-    button.set_size(180, 80);
+    button.set_align(Align::LeftMid, 30, 0)?;
+    button.set_size(180, 80)?;
     let mut btn_lbl = Label::create(&mut button)?;
     btn_lbl.set_text(CString::new("Click me!").unwrap().as_c_str())?;
 
@@ -68,33 +68,36 @@ fn main() -> Result<(), LvError> {
         }
     })?;
 
+    let mut latest_touch_point = Point::new(0, 0);
     'running: loop {
         let start = Instant::now();
         lvgl::task_handler();
         window.update(&sim_display);
 
-        let events = window.events().peekable();
+        let mut events = window.events().peekable();
+
+        if events.peek().is_none() {
+            latest_touch_status = PointerInputData::Touch(latest_touch_point.clone())
+                .released()
+                .once();
+        }
 
         for event in events {
             match event {
-                SimulatorEvent::MouseButtonDown {
-                    mouse_btn: _,
-                    point,
-                } => {
-                    println!("Clicked on: {:?}", point);
-                    latest_touch_status = PointerInputData::Touch(point).pressed().once();
-                }
                 SimulatorEvent::MouseButtonUp {
                     mouse_btn: _,
                     point,
                 } => {
-                    latest_touch_status = PointerInputData::Touch(point).released().once();
+                    println!("Clicked on: {:?}", point);
+                    // Send a event to the button directly
+                    latest_touch_point = point.clone();
+                    latest_touch_status = PointerInputData::Touch(point).pressed().once();
                 }
                 SimulatorEvent::Quit => break 'running,
                 _ => {}
             }
         }
-        sleep(Duration::from_millis(5));
+        sleep(Duration::from_millis(15));
         lvgl::tick_inc(Instant::now().duration_since(start));
     }
 
