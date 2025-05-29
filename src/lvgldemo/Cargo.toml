@@ -3,7 +3,7 @@ name = "lvgldemo"
 version = "1.0.0"
 edition = "2021"
 
-#links = ""
+links = "wayland-client"
 
 [dependencies]
 lazy_static = "1.5.0"
@@ -35,7 +35,6 @@ serde_regex = { version = "1.1", optional = true }
 #sophus = "0.14.0"
 
 nalgebra = "0.32.5"
-ceres-solver = { version = "0.4.0", features = ["source"] }
 
 rand = "0.8.5"
 pdqselect = "0.1.1"
@@ -62,6 +61,12 @@ jemalloc-ctl = "0.5.4"
 [target.'cfg(not(target_env = "msvc"))'.dependencies.jemalloc-sys]
 version = "0.5.4"
 features = ["stats", "profiling", "unprefixed_malloc_on_supported_platforms"]
+
+[target.'cfg(not(target_os="windows"))'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
+
+[target.'cfg(target="x86_64-unknown-linux-gnu")'.dependencies]
+ceres-solver = { version = "0.4.0", features = ["source"] }
 
 [profile.release]
 debug = true

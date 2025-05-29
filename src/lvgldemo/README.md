@@ -11,3 +11,21 @@ The `DEP_LV_CONFIG_PATH` environment variable is necessary, as explained in the 
 
 sudo apt install libssl-dev
 sudo apt install libsdl2-dev
+sudo apt-get install gcc-aarch64-linux-gnu
+sudo apt-get install g++-aarch64-linux-gnu
+sudo apt-get install gcc-arm-linux-gnueabihf
+sudo apt-get install g++-arm-linux-gnueabihf
+
+Raspberry Pi 2B:
+CC=clang cargo build --target=armv7-unknown-linux-gnueabihf
+
+Raspberry Pi 4B:
+DEP_LV_CONFIG_PATH='/mnt/data/app/julia/wfs2map/src/lvgldemo/include' cargo build --example sdl -p lvgldemo --target=aarch64-unknown-linux-gnu
+
+mkdir /usr/include/arm-linux-gnueabihf
+cp raspbian /usr/include/arm-linux-gnueabihf/SDL2 to /usr/include/arm-linux-gnueabihf/
+cp raspbian /usr/lib/arm-linux-gnueabihf/ to /usr/lib/arm-linux-gnueabihf/
+cargo build --target=arm-unknown-linux-gnueabihf
+
+
+qemu-system-aarch64 -M raspi3b -drive "format=raw,if=sd,file=g:/2025-05-06-raspios-bullseye-armhf.img" -no-reboot -append "rw earlyprintk loglevel=8 root=/dev/mmcblk0p2 rootdelay=1" -dtb bcm2710-rpi-3-b-plus.dtb -kernel kernel8.img -usb -device usb-mouse -device usb-kbd -device usb-net,netdev=net0 -netdev user,id=net0,hostfwd=tcp::5022-:22

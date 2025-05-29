@@ -1,0 +1,16 @@
+[target.aarch64-unknown-linux-gnu]
+linker = "aarch64-linux-gnu-gcc"
+
+[target.arm-unknown-linux-gnueabihf]
+#linker = "/rpi_tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc"
+linker = "arm-linux-gnueabihf-gcc"
+#linker = "rust-lld"
+rustflags = [
+    "-C", "link-arg=-L/home/leafcolor/app/arm-linux-gnueabihf",
+#    "-C", "link-arg=--verbose"
+]
+
+[target.armv7-unknown-linux-gnueabihf]
+#linker = "rust-lld"
+linker = "arm-linux-gnueabihf-gcc"
+rustflags = "-C target-cpu=cortex-a72"
