@@ -12,4 +12,5 @@ fn main() {
     println!("cargo:rerun-if-changed=src/examples/example_13-01.rs");
     println!("cargo:rerun-if-changed=src/opencv.cc");
     println!("cargo:rerun-if-changed=include/opencv.h");
+    println!("cargo:rustc-link-search=all=/home/leafcolor/app/arm-linux-gnueabihf");
 }

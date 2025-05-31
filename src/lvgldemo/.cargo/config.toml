@@ -1,0 +1,57 @@
+[target.aarch64-unknown-linux-gnu]
+linker = "aarch64-linux-gnu-gcc"
+
+[target.arm-unknown-linux-gnueabihf]
+#linker = "/rpi_tools/arm-bcm2708/arm-rpi-4.9.3-linux-gnueabihf/bin/arm-linux-gnueabihf-gcc"
+#linker = "arm-linux-gnueabihf-gcc"
+#linker = "rust-lld"
+rustc-link-search = { all = "/home/leafcolor/app/arm-linux-gnueabihf" }
+rustflags = [
+    #"-C", "link-arg=-Wl,-rpath-link,/home/leafcolor/app/arm-linux-gnueabihf",
+    "-C", "link-arg=-Wl,-Bdynamic",
+    "-C", "link-arg=-lwayland-client",
+    "-C", "link-arg=-lwayland-egl",
+    "-C", "link-arg=-lwayland-cursor",
+    "-C", "link-arg=-lwayland-server",
+    "-C", "link-arg=-lsystemd",
+    "-C", "link-arg=-lasyncns",
+    "-C", "link-arg=-lbsd",
+    "-C", "link-arg=-ldecor-0",
+    "-C", "link-arg=-lffi",
+    "-C", "link-arg=-lasound",
+    "-C", "link-arg=-lgbm",
+    "-C", "link-arg=-lxkbcommon",
+    "-C", "link-arg=-lXxf86vm",
+    "-C", "link-arg=-ldrm",
+    "-C", "link-arg=-ldrm_amdgpu",
+    "-C", "link-arg=-lpulse",
+    "-C", "link-arg=-lpulsecore-14.2",
+    "-C", "link-arg=-lpulsecommon-14.2",
+    "-C", "link-arg=-lpulsedsp",
+    "-C", "link-arg=-ldbus-1",
+    "-C", "link-arg=-lsamplerate",
+    "-C", "link-arg=-lwrap",
+    "-C", "link-arg=-lsndfile",
+    "-C", "link-arg=-lmd",
+    "-C", "link-arg=-lxcb",
+    #"-C", "link-arg=-lxcb-randr",
+    "-C", "link-arg=-lexpat",
+    "-C", "link-arg=-lxml2",
+    "-C", "link-arg=-lX11",
+    "-C", "link-arg=-lXext",
+    "-C", "link-arg=-lXau",
+    "-C", "link-arg=-lXi",
+    "-C", "link-arg=-lXfixes",
+    "-C", "link-arg=-lXcursor",
+    "-C", "link-arg=-lXss",
+    "-C", "link-arg=-lXdmcp",
+    "-C", "link-arg=-lXrandr",
+    "-C", "link-arg=-lXrender",
+    "-C", "link-arg=-L/home/leafcolor/app/arm-linux-gnueabihf",
+    #"-C", "link-arg=-fuse-ld=lld",
+]
+
+[target.armv7-unknown-linux-gnueabihf]
+#linker = "rust-lld"
+linker = "arm-linux-gnueabihf-gcc"
+rustflags = "-C target-cpu=cortex-a72"
