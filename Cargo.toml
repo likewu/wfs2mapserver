@@ -1,7 +1,11 @@
 [workspace]
 members = [
   "src/mapserver", "src/JWKS-Server", "src/opencvvideo",
-  "src/energy-monitor-tauri/src-tauri", "src/lvgldemo"
+  "src/energy-monitor-tauri/src-tauri",
+  "src/lv_binding_rust/lvgl",
+  "src/lv_binding_rust/lvgl-codegen",
+  "src/lv_binding_rust/lvgl-sys",
+  "src/lvgldemo",
 ]
 default-members = ["src/mapserver"]
 resolver = "2"

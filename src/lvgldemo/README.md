@@ -21,7 +21,7 @@ Raspberry Pi 2B:
 CC=clang cargo build --target=armv7-unknown-linux-gnueabihf
 
 Raspberry Pi 4B:
-LD_LIBRARY_PATH=/home/leafcolor/app/arm-linux-gnueabihf DEP_LV_CONFIG_PATH='/mnt/data/app/julia/wfs2map/src/lvgldemo/include' cargo build --example sdl2 -p lvgldemo --target=arm-unknown-linux-gnueabihf
+LIBRARY_PATH=/home/leafcolor/app/arm-linux-gnueabihf LVGL_INCLUDE=/usr/include/arm-linux-gnueabihf DEP_LV_CONFIG_PATH='/mnt/data/app/julia/wfs2map/src/lvgldemo/include' cargo build --example sdl2 -p lvgldemo --target=arm-unknown-linux-gnueabihf
 
 mkdir /usr/include/arm-linux-gnueabihf
 cp raspbian /usr/include/arm-linux-gnueabihf/SDL2 to /usr/include/arm-linux-gnueabihf/
