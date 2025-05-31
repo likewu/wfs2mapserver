@@ -250,7 +250,7 @@ fn main() {
     #[cfg(feature = "drivers")]
     link_extra.split(',').for_each(|a| {
         println!("cargo:rustc-link-lib={a}");
-        println!("cargo:rustc-link-search=/home/leafcolor/app/arm-linux-gnueabihf")
+        println!("cargo:rustc-link-search=all=/home/leafcolor/app/arm-linux-gnueabihf")
     })
 }
 

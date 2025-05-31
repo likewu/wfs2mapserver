@@ -7,6 +7,7 @@ linker = "aarch64-linux-gnu-gcc"
 #linker = "rust-lld"
 rustc-link-search = { all = "/home/leafcolor/app/arm-linux-gnueabihf" }
 rustflags = [
+    #"--verbose",
     #"-C", "link-arg=-Wl,-rpath-link,/home/leafcolor/app/arm-linux-gnueabihf",
     "-C", "link-arg=-Wl,-Bdynamic",
     "-C", "link-arg=-lwayland-client",
@@ -31,10 +32,8 @@ rustflags = [
     "-C", "link-arg=-ldbus-1",
     "-C", "link-arg=-lsamplerate",
     "-C", "link-arg=-lwrap",
-    "-C", "link-arg=-lsndfile",
     "-C", "link-arg=-lmd",
     "-C", "link-arg=-lxcb",
-    #"-C", "link-arg=-lxcb-randr",
     "-C", "link-arg=-lexpat",
     "-C", "link-arg=-lxml2",
     "-C", "link-arg=-lX11",
@@ -47,6 +46,7 @@ rustflags = [
     "-C", "link-arg=-lXdmcp",
     "-C", "link-arg=-lXrandr",
     "-C", "link-arg=-lXrender",
+    #"-C", "link-arg=-lsndfile",
     "-C", "link-arg=-L/home/leafcolor/app/arm-linux-gnueabihf",
     #"-C", "link-arg=-fuse-ld=lld",
 ]
