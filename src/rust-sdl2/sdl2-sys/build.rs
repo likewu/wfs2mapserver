@@ -231,6 +231,7 @@ fn link_sdl2(target_os: &str) {
         {
             println!("cargo:rustc-link-lib=static=SDL2main");
             println!("cargo:rustc-link-lib=static=SDL2");
+            println!("cargo:rustc-link-search=all=/home/leafcolor/app/arm-linux-gnueabihf");
         }
 
         // Also linked to any required libraries for each supported platform
