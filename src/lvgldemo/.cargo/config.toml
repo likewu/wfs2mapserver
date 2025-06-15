@@ -63,6 +63,8 @@ rustflags = [
     #"-C", "target-cpu=cortex-a72",
     "-C", "link-arg=--sysroot=/home/leafcolor/opt/cross-pi-gcc-14.2.0-2/arm-linux-gnueabihf/libc",
     "-C", "target-feature=+crt-static",
+    "-C", "link-arg=-Wl,-rpath-link,/home/leafcolor/app/arm-linux-gnueabihf",
+    "-C", "link-arg=-Wl,--copy-dt-needed-entries",
     "-C", "link-arg=-Wl,-Bdynamic",
     "-C", "link-arg=-lwayland-client",
     "-C", "link-arg=-lwayland-egl",
@@ -99,6 +101,7 @@ rustflags = [
     "-C", "link-arg=-lXdmcp",
     "-C", "link-arg=-lXrandr",
     "-C", "link-arg=-lXrender",
+    "-C", "link-arg=-lXinerama",
     "-C", "link-arg=-L/home/leafcolor/app/arm-linux-gnueabihf",
     #"-C", "link-arg=-fuse-ld=lld",
 ]
