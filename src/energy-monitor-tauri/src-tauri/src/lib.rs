@@ -1,3 +1,5 @@
+mod jlrs;
+
 use rand::Rng;
 use std::convert::TryInto;
 use std::sync::atomic::{AtomicBool, Ordering};
