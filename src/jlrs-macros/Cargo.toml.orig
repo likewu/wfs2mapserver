@@ -1,0 +1,41 @@
+[package]
+name = "jlrs-macros"
+version = "0.4.0"
+authors = ["Thomas van Doornmalen <thomas.vandoornmalen@gmail.com>"]
+description = """
+jlrs-macros contains the custom derives offered by jlrs.
+"""
+documentation = "https://docs.rs/jlrs-macros"
+homepage = "https://github.com/Taaitaaiger/jlrs"
+repository = "https://github.com/Taaitaaiger/jlrs"
+readme = "../README.md"
+keywords = ["Julia", "math", "mathematics", "bindings", "ffi"]
+license = "MIT"
+edition = "2021"
+rust-version = "1.77"
+
+[features]
+default = []
+julia-1-6 = []
+julia-1-7 = []
+julia-1-8 = []
+julia-1-9 = []
+julia-1-10 = []
+julia-1-11 = []
+julia-1-12 = []
+windows = []
+
+derive = ["proc-macro2"]
+ccall = ["proc-macro2"]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+proc-macro2 = { version = "1", optional = true }
+syn = { version = "2", features = ["full", "extra-traits"] }
+quote = { version = "1" }
+itertools = "0.13"
+
+[package.metadata.docs.rs]
+features = ["ccall", "derive", "julia-1-12"]

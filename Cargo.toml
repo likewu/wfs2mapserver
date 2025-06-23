@@ -3,13 +3,16 @@ members = [
   #"src/mapserver",
   "src/JWKS-Server",
   #"src/opencvvideo",
-  #"src/energy-monitor-tauri/src-tauri",
+  "src/energy-monitor-tauri/src-tauri",
+  "src/jlrs",
+  "src/jlrs-macros",
+  "src/jl-sys",
   #"src/lv_binding_rust/lvgl",
   #"src/lv_binding_rust/lvgl-codegen",
   #"src/lv_binding_rust/lvgl-sys",
-  "src/rust-sdl2/sdl2-sys",
-  "src/rust-sdl2",
-  "src/lvgldemo",
+  #"src/rust-sdl2/sdl2-sys",
+  #"src/rust-sdl2",
+  #"src/lvgldemo",
 ]
 default-members = ["src/mapserver"]
 resolver = "2"
