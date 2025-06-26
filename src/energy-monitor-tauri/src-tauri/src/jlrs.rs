@@ -43,5 +43,10 @@ fn init_process(window: Window) {
 
       let mul_mut_func = lin_alg.unwrap().global(&mut frame, "mul!");
       assert!(mul_mut_func.is_ok());
+
+      let code = "println(\"Hello, world!\")";
+      let ret = unsafe {
+        Value::eval_string(&mut frame, code)
+      }.expect("err");
   })
 }
