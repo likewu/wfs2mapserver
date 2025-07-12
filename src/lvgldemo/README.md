@@ -54,3 +54,6 @@ cd F:\zephyrproject\zephyr
 ..\.venv\Scripts\west build -b esp32s3_devkitc/esp32s3/procpu samples/subsys/display/lvgl
 ..\.venv\Scripts\west build -b esp32s3_devkitc/esp32s3/procpu --shield st7735r_ada_160x128 samples/subsys/display/lvgl
 ..\.venv\Scripts\west build -b native_sim --build-dir build2 samples/subsys/display/lvgl
+
+cd F:\zephyrproject\zephyr\samples\subsys\display\10_demo_display
+F:\zephyrproject\.venv\Scripts\west build -p always -b esp32s3_devkitc/esp32s3/procpu -- -DDTC_OVERLAY_FILE=boards/esp32s3_devkitc.overlay
