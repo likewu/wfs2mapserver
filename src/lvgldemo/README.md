@@ -38,3 +38,17 @@ sdl2-config --static-libs
 
 
 qemu-system-aarch64 -M raspi3b -drive "format=raw,if=sd,file=g:/2025-05-06-raspios-bullseye-armhf.img" -no-reboot -append "rw earlyprintk loglevel=8 root=/dev/mmcblk0p2 rootdelay=1" -dtb bcm2710-rpi-3-b-plus.dtb -kernel kernel8.img -usb -device usb-mouse -device usb-kbd -device usb-net,netdev=net0 -netdev user,id=net0,hostfwd=tcp::5022-:22
+
+
+
+https://blog.csdn.net/godmial/article/details/142933699
+zephyr:
+.venv\Scripts\west sdk install -b "f:/zephyrsdk" -t aarch64-zephyr-elf arm-zephyr-eabi riscv64-zephyr-elf xtensa-espressif_esp32s3_zephyr-elf x86_64-zephyr-elf
+
+$env.Path = ($env.Path | prepend 'G:\Espressif\tools\ninja\1.12.1' | prepend 'F:\cmake-3.30.3-windows-x86_64\bin' | prepend 'D:\LLVM-19.1.0-Windows-X64\bin' | prepend 'D:\msys64\usr\bin')
+cd F:\zephyrproject\zephyr
+..\.venv\Scripts\west build -b esp32s2_devkitc samples/modules/lvgl/demos
+..\.venv\Scripts\west build -b rpi_pico2/rp2350b/m33 samples/modules/lvgl/demos
+..\.venv\Scripts\west build -b qemu_x86 samples/modules/lvgl/demos
+..\.venv\Scripts\west build -b esp32s3_devkitc/esp32s3/procpu samples/subsys/display/lvgl
+..\.venv\Scripts\west build -b native_sim --build-dir build2 samples/subsys/display/lvgl
