@@ -2,6 +2,7 @@
 #include <zephyr/drivers/display.h>
 #include <lvgl.h>
 #include <string.h>
+#include <stdio.h>
 
 // Settings
 static const int32_t sleep_time_ms = 50;        // Target 20 FPS
@@ -17,7 +18,7 @@ int main(void)
     lv_obj_t *circle;
     lv_style_t rect_style;
     lv_style_t circle_style;
-    lv_point_t rect_points[5] = { {0, 0}, {120, 0}, {120, 20}, {0, 20}, {0, 0} };
+    lv_point_precise_t rect_points[5] = { {0, 0}, {120, 0}, {120, 20}, {0, 20}, {0, 0} };
     const uint32_t circle_radius = 15;
 
     // Initialize the display
