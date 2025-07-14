@@ -2,11 +2,11 @@ import { createApp } from "vue";
 import { createMemoryHistory, createRouter } from 'vue-router'
 
 import App from "./App.vue";
-
 import Three from './components/Three.vue'
 
 const routes = [
-  { path: '/tree', component: Three },
+  { path: '/', component: App },
+  { path: '/three', component: Three },
 ]
 const router = createRouter({
   history: createMemoryHistory(),

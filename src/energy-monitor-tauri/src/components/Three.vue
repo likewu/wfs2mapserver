@@ -24,12 +24,15 @@ function init() {
   scene.add(camera);
 
   // a cube in the scene
-  var cube = new THREE.Mesh(
+  /*var cube = new THREE.Mesh(
     new THREE.CubeGeometry(1, 2, 3),
     new THREE.MeshBasicMaterial({
       color: 0xff0000,
     })
-  );
+  );*/
+  const geometry = new THREE.BoxGeometry();
+  const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+  const cube = new THREE.Mesh(geometry, material);
   scene.add(cube);
 
   // render
