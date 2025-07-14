@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
 import MyChart from './components/MyChart.vue'
-import { invoke } from "@tauri-apps/api/core";
+import { invoke } from "@tauri-apps/api/core"
 import { listen } from '@tauri-apps/api/event'
 
 export default defineComponent({
@@ -51,7 +51,7 @@ export default defineComponent({
     <h3> 
       ... brought to you by a rodent 🐿️.     
       <button @click="toggleDemo()">{{demo ? 'DEMO' : 'LIVE'}}</button>
-   </h3>
+    </h3>
     
 
     <div class="chart-container" style="margin:0 auto; width:70vw">
