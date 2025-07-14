@@ -60,8 +60,14 @@ cd F:\zephyrproject\zephyr
 ..\.venv\Scripts\west build -t run
 
 
-cd /mnt/hgfs/app/zephyrproject/zephyr
-../.venvlinux/Scripts/west build -b native_sim --build-dir build2 samples/subsys/display/lvgl
+source ~/zephyrproject/.venvlinux/bin/activate
+west sdk install -b "/mnt/hgfs/fapp/zephyrsdk" -t x86_64-zephyr-elf
+cd /mnt/hgfs/fapp/zephyrproject/zephyr
+export ZEPHYR_SDK_INSTALL_DIR=/mnt/hgfs/fapp/zephyrsdk/zephyr-sdk-0.17.0
+#export NSI_EXTRA_INCLUDES=/usr/include/x86_64-linux-gnu
+west build -b native_sim/native/64 --build-dir /home/likewu/app/build2 samples/subsys/display/lvgl
+ -- -DNSI_EXTRA_LIBS="/usr/lib/x86_64-linux-gnu"
+ -- -DNSI_EXTRA_INCLUDES="-I/usr/include/x86_64-linux-gnu"
 
 cd F:\zephyrproject\zephyr\samples\subsys\display\10_demo_display
 F:\zephyrproject\.venv\Scripts\west build -p always -b esp32s3_devkitc/esp32s3/procpu -- -DDTC_OVERLAY_FILE=boards/esp32s3_devkitc.overlay
