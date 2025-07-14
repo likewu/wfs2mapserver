@@ -41,6 +41,9 @@ qemu-system-aarch64 -M raspi3b -drive "format=raw,if=sd,file=g:/2025-05-06-raspi
 
 
 
+https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-guides/tools/qemu.html
+https://blog.csdn.net/skywalk8163/article/details/144499393
+https://shawnhymel.com/2807/how-to-run-an-esp32-zephyr-application-on-espressifs-qemu/
 https://www.digikey.com/en/maker/tutorials/2025/introduction-to-zephyr-part-10-graphics-with-lvgl-and-display-drivers
 https://blog.csdn.net/godmial/article/details/142933699
 zephyr:
@@ -50,10 +53,15 @@ $env.Path = ($env.Path | prepend 'G:\Espressif\tools\ninja\1.12.1' | prepend 'F:
 cd F:\zephyrproject\zephyr
 ..\.venv\Scripts\west build -b esp32s2_devkitc samples/modules/lvgl/demos
 ..\.venv\Scripts\west build -b rpi_pico2/rp2350b/m33 samples/modules/lvgl/demos
-..\.venv\Scripts\west build -b qemu_x86 samples/modules/lvgl/demos
 ..\.venv\Scripts\west build -b esp32s3_devkitc/esp32s3/procpu samples/subsys/display/lvgl
 ..\.venv\Scripts\west build -b esp32s3_devkitc/esp32s3/procpu --shield st7735r_ada_160x128 samples/subsys/display/lvgl
-..\.venv\Scripts\west build -b native_sim --build-dir build2 samples/subsys/display/lvgl
+..\.venv\Scripts\west build -b qemu_x86 samples/modules/lvgl/demos
+..\.venv\Scripts\west build -b qemu_xtensa/dc233c samples/modules/lvgl/demos
+..\.venv\Scripts\west build -t run
+
+
+cd /mnt/hgfs/app/zephyrproject/zephyr
+../.venvlinux/Scripts/west build -b native_sim --build-dir build2 samples/subsys/display/lvgl
 
 cd F:\zephyrproject\zephyr\samples\subsys\display\10_demo_display
 F:\zephyrproject\.venv\Scripts\west build -p always -b esp32s3_devkitc/esp32s3/procpu -- -DDTC_OVERLAY_FILE=boards/esp32s3_devkitc.overlay
