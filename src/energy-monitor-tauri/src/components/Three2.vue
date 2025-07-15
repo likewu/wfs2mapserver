@@ -1,21 +1,24 @@
 <template>
   <div id="app">
-    <canvas id="mainCanvas" class="main"></canvas>
   </div>
 </template>
 
 
 <script>
 import * as THREE from "three";
+import TWEEN from '@tweenjs/tween.js';
 
 // Three JS Template
 //----------------------------------------------------------------- BASIC parameters
 var renderer = new THREE.WebGLRenderer({
   antialias: true,
-  canvas: document.getElementById("mainCanvas"),
+  //canvas: document.getElementById("mainCanvas"),
 });
 renderer.setClearColor(0x000000); // black
 renderer.setSize( window.innerWidth, window.innerHeight );
+
+const coords = {x: 0, y: 0} // Start at (0, 0)
+const TweenMax = new TWEEN.Tween(coords);
 
 if (window.innerWidth > 800) {
   renderer.shadowMap.enabled = true;
@@ -80,7 +83,7 @@ function setTintColor() {
 function init() {
   var segments = 2;
   for (var i = 1; i<100; i++) {
-    var geometry = new THREE.CubeGeometry(1,0,0,segments,segments,segments);
+    var geometry = new THREE.BoxGeometry(1,0,0,segments,segments,segments);
     var material = new THREE.MeshStandardMaterial({
       color:setTintColor(),
       wireframe:false,
@@ -225,7 +228,7 @@ var generateCar = function() {
 
 var createCars = function(cScale = 2, cPos = 20, cColor = 0xFFFF00) {
   var cMat = new THREE.MeshToonMaterial({color:cColor, side:THREE.DoubleSide});
-  var cGeo = new THREE.CubeGeometry(1, cScale/40, cScale/40);
+  var cGeo = new THREE.BoxGeometry(1, cScale/40, cScale/40);
   var cElem = new THREE.Mesh(cGeo, cMat);
   var cAmp = 3;
   
@@ -241,7 +244,7 @@ var createCars = function(cScale = 2, cPos = 20, cColor = 0xFFFF00) {
     cElem.position.z = -cPos;
     cElem.rotation.y = 90 * Math.PI / 180;
   
-    TweenMax.to(cElem.position, 5, {z:cPos, repeat:-1, yoyo:true, delay:mathRandom(3), ease:Power1.easeInOut});
+    TweenMax.to(cElem.position, 5, {z:cPos, repeat:-1, yoyo:true, delay:mathRandom(3)}).easing(TWEEN.Easing.Cubic.InOut);
   };
   cElem.receiveShadow = true;
   cElem.castShadow = true;

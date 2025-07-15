@@ -52,8 +52,8 @@ export default defineComponent({
       ... brought to you by a rodent 🐿️.     
       <button @click="toggleDemo()">{{demo ? 'DEMO' : 'LIVE'}}</button>
     </h3>
-    <a href="/three">three js</a>
     <router-link to="/three">three js</router-link>
+    <router-link to="/three2">three2 js</router-link>
     
 
     <div class="chart-container" style="margin:0 auto; width:70vw">
