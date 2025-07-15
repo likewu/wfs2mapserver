@@ -95,7 +95,7 @@ static void example_lvgl_port_task(void *arg)
         vTaskDelay(pdMS_TO_TICKS(task_delay_ms));
     }
 }
- 
+
 static size_t example_lvgl_get_buffers(esp_lcd_panel_handle_t panel_handle, void **buf1, void **buf2)
 {
     if (buf2) {
@@ -113,7 +113,7 @@ static size_t example_lvgl_get_buffers(esp_lcd_panel_handle_t panel_handle, void
     return EXAMPLE_LCD_H_RES * 10;
 #endif // CONFIG_EXAMPLE_DOUBLE_FB
 }
- 
+
 void app_main(void)
 {
     static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
@@ -138,7 +138,7 @@ void app_main(void)
     void *buf2 = NULL;
     const size_t buf_pixels = example_lvgl_get_buffers(panel_handle, &buf1, &buf2);
     lv_disp_draw_buf_init(&disp_buf, buf1, buf2, buf_pixels);
- 
+
     ESP_LOGI(TAG, "Register display driver to LVGL");
     lv_disp_drv_init(&disp_drv);
     disp_drv.hor_res = EXAMPLE_LCD_H_RES;
@@ -150,7 +150,7 @@ void app_main(void)
     disp_drv.full_refresh = true; // the full_refresh mode can maintain the synchronization between the two frame buffers
 #endif
     lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
- 
+
     ESP_LOGI(TAG, "Install LVGL tick timer");
     // Tick interface for LVGL (using esp_timer to generate 2ms periodic event)
     const esp_timer_create_args_t lvgl_tick_timer_args = {

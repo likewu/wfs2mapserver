@@ -5,8 +5,8 @@
  */
  
 // This demo UI is adapted from LVGL official example: https://docs.lvgl.io/master/examples.html#scatter-chart
- 
-#include "lvgl.h"
+
+#include <lvgl.h>
 #include <stdio.h>
  
 static void draw_event_cb(lv_event_t *e)
